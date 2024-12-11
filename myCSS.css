@@ -1,0 +1,40 @@
+
+body {
+        /*width: 800px; */
+        border: 1px solid #ccc;
+        padding: 10px;
+        overflow: auto;        
+        /*white-space: pre-wrap; */
+        }
+        
+input {
+        width: 50px;
+}       
+
+div {
+        width: 800px;
+        color: blue;
+        font-size: 24px;                
+        margin-bottom: 10px;
+        text-align: center;
+        font-weight: bold;
+        }
+
+        #findStock {
+                color: chocolate;
+                text-align: left;
+        }
+
+ span {
+        color: brown;
+ }       
+
+button {
+        margin-top: 8px;
+        padding: 0.3em;
+        border-color:chocolate;
+        border-radius: 0.3em;
+        background-color: burlywood;
+        } 
+
+           

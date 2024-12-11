@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--为搜索引擎定义关键词:
+    <meta name="keywords" content="HTML, CSS, XML, XHTML, JavaScript">
+    为网页定义描述内容:
+    <meta name="description" content="免费 Web & 编程 教程">
+    定义网页作者:
+    <meta name="author" content="Runoob">
+    每30秒钟刷新当前页面:
+    <meta http-equiv="refresh" content="30">
+    -->
+
+    <title>[翰哥Hanger]股票投資系統</title>    
+    <link rel="stylesheet" type="text/css" href="./cssSheet.css">    
+    <link rel="stylesheet" type="text/css" href="./myCSS.css" >    
+</head>
+    
+<body>
+   <!--  <input type="file" id="source">
+   <hr>
+   <button id="display_btn">顯示</button><br>
+    -->
+   <div>Hanger股票投資系統</div>
+
+   <div>
+    <span>股票名稱</span>
+    <input type="text" id="stockName" name="stockName">   
+    <span>股票代號</span>
+    <input type="text" id="stockNo" name="stockNo">   
+    <span>交易日期</span>
+    <input type="text" id="transDate" name="transDate">   
+    <span>成交價</span>
+    <input type="text" id="transAmount" name="transAmount">
+    <span>股數</span>
+    <input type="text" id="stockNum" name="stockNum">
+    <br>
+   </div>
+
+   <div>
+    <button onclick="inData()">加入資料</button>
+    <button onclick="lookUpData()">查詢資料</button>
+    <button onclick="upData()">更新資料</button>
+    <button onclick="deleteData('customers')">刪除資料</button>
+   </div>
+
+   <div> 代號 名稱 日期 價格 股數 </div>
+   <div id="findStock"></div> 
+
+   <script src="./myJS.js"></script>
+
+</body>
+</html>
