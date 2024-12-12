@@ -96,9 +96,10 @@ function lookUpData()
       data.push(cursor.value);     
       cursor.continue(); // 遍历了存储对象中的所有内容
     } else {
-      console.log("游标读取的数据：", data);
+      //console.log("游标读取的数据：", data);
 
       var displayDiv = document.getElementById("findStock");      
+
       data.forEach(function(item) { 
         var p = document.createElement("p");
          p.textContent =
@@ -107,8 +108,26 @@ function lookUpData()
          " " + item.date +
          " " + item.amount +
          " " + item.stocknum; 
-         displayDiv.appendChild(p);
-      });             
+         //displayDiv.appendChild(p);
+                  
+      //將資料置入表格中
+      var table=document.getElementById('stockTable');
+      var newRow=table.insertRow();
+      
+      var idCell=newRow.insertCell(0);
+      var nameCell=newRow.insertCell(1);
+      var dateCell=newRow.insertCell(2);
+      var amountCell=newRow.insertCell(3);
+      var stocknumidCell=newRow.insertCell(4);
+      
+      idCell.textContent=item.id;
+      nameCell.textContent=item.name;
+      dateCell.textContent=item.date;
+      amountCell.textContent=item.amount;
+      stocknumidCell.textContent=item.stocknum;
+
+    }); 
+
     }    
   }          
 }

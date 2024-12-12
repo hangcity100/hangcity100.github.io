@@ -19,12 +19,11 @@
 </head>
     
 <body>
-   <!--  <input type="file" id="source">
-   <hr>
+   <!--  <input type="file" id="source">   
    <button id="display_btn">顯示</button><br>
     -->
-   <div>Hanger股票投資系統</div>
 
+   <div>Hanger股票投資系統</div>
    <div>
     <span>股票名稱</span>
     <input type="text" id="stockName" name="stockName">   
@@ -44,10 +43,27 @@
     <button onclick="lookUpData()">查詢資料</button>
     <button onclick="upData()">更新資料</button>
     <button onclick="deleteData('customers')">刪除資料</button>
-   </div>
+   </div>      
 
-   <div> 代號 名稱 日期 價格 股數 </div>
    <div id="findStock"></div> 
+
+   <table id="stockTable">
+    <thead>
+      <tr>
+        <th>股票代號</th>
+        <th>股票名稱</th>
+        <th>交易日期</th>
+        <th>交易價格</th>
+        <th>交易股數</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>        
+      </tr>
+    </tbody>
+  </table>
+
+
 
    <script src="./myJS.js"></script>
 
