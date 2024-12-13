@@ -16,9 +16,17 @@ div {
         color: blue;
         font-size: 24px;                
         margin-bottom: 10px;
-        text-align: center;
+        text-align: left;
         font-weight: bold;
         }
+
+.container { 
+        display: flex; 
+        align-items: center;  
+        } 
+img { 
+        margin-right: 10px; 
+    } 
 
         #findStock {
                 color: chocolate;

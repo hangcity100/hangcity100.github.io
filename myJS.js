@@ -70,6 +70,7 @@ function lookUpData()
     console.log("索引查詢結果:", result);
   }; 
 
+  creatAthead(); //創建一個表頭
   cursorGetData(db,storeName);
   cursorGetDataByIndex(db, storeName, indexName, indexValue); 
 } 
@@ -90,28 +91,31 @@ function lookUpData()
     var cursor = e.target.result;
 
     //findStock.innerHTML="";
-
+    
     if (cursor) {
       // 必须要检查
       data.push(cursor.value);     
       cursor.continue(); // 遍历了存储对象中的所有内容
-    } else {
-      //console.log("游标读取的数据：", data);
-
-      var displayDiv = document.getElementById("findStock");      
-
-      data.forEach(function(item) { 
-        var p = document.createElement("p");
-         p.textContent =
-         " " + item.id + 
-         " " + item.name +
-         " " + item.date +
-         " " + item.amount +
-         " " + item.stocknum; 
-         //displayDiv.appendChild(p);
-                  
-      //將資料置入表格中
-      var table=document.getElementById('stockTable');
+    } else {      
+    //var displayDiv = document.getElementById("findStock");      
+    //data.forEach(function(item) { 
+    //  var p = document.createElement("p");
+    //  p.textContent =
+    //  " " + item.id + 
+    //  " " + item.name +
+    //  " " + item.date +
+    //  " " + item.amount +
+    //  " " + item.stocknum; 
+    //  displayDiv.appendChild(p);                                
+    //}); 
+      creatTBody(data);
+    }    
+  }          
+}
+function creatTBody(data)
+{
+  data.forEach(function(item) {
+  var table = document.getElementById("stockTable");      
       var newRow=table.insertRow();
       
       var idCell=newRow.insertCell(0);
@@ -119,19 +123,44 @@ function lookUpData()
       var dateCell=newRow.insertCell(2);
       var amountCell=newRow.insertCell(3);
       var stocknumidCell=newRow.insertCell(4);
+      var stockAcountCell=newRow.insertCell(5);
       
       idCell.textContent=item.id;
       nameCell.textContent=item.name;
       dateCell.textContent=item.date;
       amountCell.textContent=item.amount;
       stocknumidCell.textContent=item.stocknum;
-
-    }); 
-
-    }    
-  }          
+      stockAcountCell.textContent=item.amount*item.stocknum;
+  });    
 }
+function creatAthead()
+{
+   // Select the table by its ID 
+   var table = document.getElementById("stockTable"); 
+   var newHeaders = [        
+     "股票代號",
+     "股票名稱",
+     "交易日期",
+     "交易價格",
+     "交易股數",
+     "交易總價"
+   ];       
+   // 取得表頭列 
+   var headerRow = table.querySelector("thead tr"); 
+   // 新增每個表頭 
+   newHeaders.forEach(function(headerText) {
+     var newHeader = document.createElement("th");
+     newHeader.textContent = headerText;
+     headerRow.appendChild(newHeader);        
+   });
 
+   // Create a new <th> element  新增一個表頭項
+      //var newHeader = document.createElement("th"); 
+      // Set the text content of the new header 
+      //newHeader.textContent = "購入成本"; 
+      // Append the new header to the table's <thead> row 
+      //table.querySelector("thead tr").appendChild(newHeader);
+}
  /**
  * 通过索引和游标查询记录
  * @param {object} db 数据库实例
