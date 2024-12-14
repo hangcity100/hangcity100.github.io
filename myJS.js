@@ -17,6 +17,9 @@ request.onupgradeneeded = function(event) {
 request.onsuccess = function(event) {
   console.log("開檔成功");   
   db=event.target.result;
+
+  creatAthead(); //創建一個表頭
+  cursorGetData(db,'customers');
 };
 
 request.onerror = function(event) {
@@ -46,6 +49,9 @@ function inData(){
 
       transaction.oncomplete = function() {
       console.log('已經存入資料!');
+      clearTBody();
+      creatAthead(); //創建一個表頭
+      cursorGetData(db,'customers');
       };
 
       transaction.onerror = function(event) {
@@ -70,6 +76,8 @@ function lookUpData()
     console.log("索引查詢結果:", result);
   }; 
 
+  //creatAthead(); //創建一個表頭
+  clearTBody();
   creatAthead(); //創建一個表頭
   cursorGetData(db,storeName);
   cursorGetDataByIndex(db, storeName, indexName, indexValue); 
@@ -108,35 +116,43 @@ function lookUpData()
     //  " " + item.stocknum; 
     //  displayDiv.appendChild(p);                                
     //}); 
-      creatTBody(data);
+      creatTBody(data);      
     }    
   }          
 }
 function creatTBody(data)
 {
+    var table = document.getElementById("stockTable");       
+ 
   data.forEach(function(item) {
-  var table = document.getElementById("stockTable");      
-      var newRow=table.insertRow();
-      
-      var idCell=newRow.insertCell(0);
-      var nameCell=newRow.insertCell(1);
-      var dateCell=newRow.insertCell(2);
-      var amountCell=newRow.insertCell(3);
-      var stocknumidCell=newRow.insertCell(4);
-      var stockAcountCell=newRow.insertCell(5);
-      
-      idCell.textContent=item.id;
-      nameCell.textContent=item.name;
-      dateCell.textContent=item.date;
-      amountCell.textContent=item.amount;
-      stocknumidCell.textContent=item.stocknum;
-      stockAcountCell.textContent=item.amount*item.stocknum;
-  });    
+    
+    var row = document.createElement('tr');
+    
+    var cell = document.createElement('td');
+    cell.textContent = item.id; row.appendChild(cell);
+    var cell = document.createElement('td');
+    cell.textContent = item.name; row.appendChild(cell);
+    var cell = document.createElement('td');
+    cell.textContent = item.date; row.appendChild(cell);
+    var cell = document.createElement('td');
+    cell.textContent = item.amount; row.appendChild(cell);
+    var cell = document.createElement('td');
+    cell.textContent = item.stocknum; row.appendChild(cell);
+    var cell = document.createElement('td');
+    cell.textContent = item.amount*item.stocknum;  row.appendChild(cell);
+    
+    table.appendChild(row);
+    });
 }
-function creatAthead()
+function clearTBody() 
 {
-   // Select the table by its ID 
-   var table = document.getElementById("stockTable"); 
+  var table=document.getElementById('stockTable');
+  table.innerHTML='';
+}
+  
+function creatAthead()
+{    
+   var table = document.getElementById("stockTable");    
    var newHeaders = [        
      "股票代號",
      "股票名稱",
@@ -145,21 +161,15 @@ function creatAthead()
      "交易股數",
      "交易總價"
    ];       
-   // 取得表頭列 
-   var headerRow = table.querySelector("thead tr"); 
+   //        
+   var headerRow = document.createElement('tr');
    // 新增每個表頭 
    newHeaders.forEach(function(headerText) {
-     var newHeader = document.createElement("th");
-     newHeader.textContent = headerText;
-     headerRow.appendChild(newHeader);        
-   });
-
-   // Create a new <th> element  新增一個表頭項
-      //var newHeader = document.createElement("th"); 
-      // Set the text content of the new header 
-      //newHeader.textContent = "購入成本"; 
-      // Append the new header to the table's <thead> row 
-      //table.querySelector("thead tr").appendChild(newHeader);
+     var cell = document.createElement('th');
+     cell.textContent=headerText;     
+     headerRow.appendChild(cell);           
+     table.appendChild(headerRow);
+   }); 
 }
  /**
  * 通过索引和游标查询记录
@@ -228,11 +238,14 @@ var request = db
   .objectStore(storeName)
   .delete(id);
 
-request.onsuccess = function () {
-  console.log("数据删除成功");
-};
+  request.onsuccess = function () {
+    console.log("数据删除成功");
+    clearTBody();
+    creatAthead(); //創建一個表頭
+    cursorGetData(db,storeName);  
+  };
 
-request.onerror = function () {
-  console.log("数据删除失败");
-};
+  request.onerror = function () {
+    console.log("数据删除失败");
+  };
 }

@@ -13,9 +13,18 @@
     <meta http-equiv="refresh" content="30">
     -->
 
-    <title>[翰哥Hanger]股票投資系統</title>    
+    <title>[翰哥Hange]</title>    
+    <link rel="stylesheet" htef="https://fonts.googleapis.com/css?family=Rancho&effect=shadow-multiple|3d-float">    
+
     <link rel="stylesheet" type="text/css" href="./cssSheet.css">    
     <link rel="stylesheet" type="text/css" href="./myCSS.css" >    
+    <style>
+      .container {       
+        font-family: 'Tangerine', serif;
+        font-size: 48px;
+        text-shadow: 4px 4px 4px rgb(200, 0, 125);
+      }
+    </style>
 </head>
     
 <body>
@@ -25,7 +34,7 @@
    
   <div class="container"> 
     <img src="../images/log1.png" alt="Logo" width="100" height="100"> 
-    <div>Hanger股票投資系統</div> 
+    <div>Hange 股票投資系統</div> 
   </div>
 
 
@@ -43,23 +52,21 @@
     <br>
    </div>
 
-   <div>
+  <div>
     <button onclick="inData()">加入資料</button>
     <button onclick="lookUpData()">查詢資料</button>
     <button onclick="upData()">更新資料</button>
     <button onclick="deleteData('customers')">刪除資料</button>
-   </div>      
+  </div>      
 
-   <div id="findStock"></div> 
+  <div id="findStock"></div> 
 
-   <table id="stockTable">
-   <thead>
-      <tr>        
-      </tr>
+  <table id="stockTable">
+    <thead>
+      <tr></tr>
     </thead>
-    <tbody>
-      <tr>        
-      </tr>
+    <tbody>                             
+      <tr id="tbdd"></tr>
     </tbody>
   </table>
 
