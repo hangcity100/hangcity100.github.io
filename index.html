@@ -14,59 +14,69 @@
     -->
 
     <title>[翰哥Hange]</title>    
-    <link rel="stylesheet" htef="https://fonts.googleapis.com/css?family=Rancho&effect=shadow-multiple|3d-float">    
-
-    <link rel="stylesheet" type="text/css" href="./cssSheet.css">    
-    <link rel="stylesheet" type="text/css" href="./myCSS.css" >    
-    <style>
-      .container {       
-        font-family: 'Tangerine', serif;
-        font-size: 48px;
-        text-shadow: 4px 4px 4px rgb(200, 0, 125);
-      }
-    </style>
+    <link rel="stylesheet" type="text/css" href="./cssSheet.css"> 
+    <link rel="stylesheet" htef="https://fonts.googleapis.com/css?family=Rancho&effect=shadow-multiple|3d-float">               
+    <link rel="stylesheet" type="text/css" href="./myCSS.css" >                  
 </head>
     
 <body>
-   <!--  <input type="file" id="source">   
-   <button id="display_btn">顯示</button><br>
-    -->
-   
+
   <div class="container"> 
     <img src="../images/log1.png" alt="Logo" width="100" height="100"> 
-    <div>Hange 股票投資系統</div> 
+    <div>      
+      <div>翰哥股票投資系統</div>
+      <span>HANGE STACK INVESTMENT SYSTEM</span>     
+    </div>
+  </div>     
+
+  <div class="buysell">        
+      <div>
+        <label >
+          <input type="radio" id="buy" name="buy_sell" value="buy" checked>
+          買入
+        </label> <br>
+        <label >
+          <input type="radio" id="sell" name="buy_sell" value="sell">
+          賣出
+        </label>    
+      </div>
+      <span>        
+          <!--<span>股票名稱</span>-->
+          <label >股票名稱
+              <input type="text" id="stockName" name="stockName">          
+          </label>
+          <label >股票代號
+              <input type="text" id="stockNo" name="stockNo">   
+          </label>
+          <label >交易日期
+              <input type="text" id="transDate" name="transDate">   
+          </label>
+          <label >成交價
+              <input type="text" id="transAmount" name="transAmount">
+          </label>
+          <label >交易股數
+              <input type="text" id="stockNum" name="stockNum">
+          </label>
+      <span>
   </div>
 
-
-   <div>
-    <span>股票名稱</span>
-    <input type="text" id="stockName" name="stockName">   
-    <span>股票代號</span>
-    <input type="text" id="stockNo" name="stockNo">   
-    <span>交易日期</span>
-    <input type="text" id="transDate" name="transDate">   
-    <span>成交價</span>
-    <input type="text" id="transAmount" name="transAmount">
-    <span>交易股數</span>
-    <input type="text" id="stockNum" name="stockNum">
-    <br>
-   </div>
-
   <div>
-    <button onclick="inData()">加入資料</button>
-    <button onclick="lookUpData()">查詢資料</button>
-    <button onclick="upData()">更新資料</button>
-    <button onclick="deleteData('customers')">刪除資料</button>
+    <button onclick="inData()">加入</button>
+    <button onclick="lookUpData()">查詢</button>
+    <button onclick="upData()">更新</button>
+    <button onclick="deleteData('customers')">刪除</button>
   </div>      
 
   <div id="findStock"></div> 
 
-  <table id="stockTable">
-    <thead>
-      <tr></tr>
-    </thead>
-    <tbody>                             
-      <tr id="tbdd"></tr>
+  <table>    
+    <thead id="stockTable">
+      <th>                                  
+      </th>
+    </thead>        
+    <tbody id="stockTbody">                                         
+      <tr>
+      </tr>
     </tbody>
   </table>
 

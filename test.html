@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dynamic Checkbox in Table</title>
+</head>
+<body>
+
+<table id="stockTable">
+  <thead>
+    <tr>
+      <th>Select</th>
+      <th>Name</th>
+      <th>Age</th>
+    </tr>
+  </thead>
+  <tbody>                             
+    <tr id="tbdd">        
+    </tr>
+  </tbody>
+</table>
+
+<button onclick="addCheckbox()">Add Checkbox</button>
+
+<script>
+  function addCheckbox() {
+    var tbody = document.getElementById("stockTable").getElementsByTagName('tbody')[0];
+    var newRow = tbody.insertRow();
+
+    var checkboxCell = newRow.insertCell(0);
+    var nameCell = newRow.insertCell(1);
+    var ageCell = newRow.insertCell(2);
+
+    var checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.name = "checkbox" + (tbody.rows.length);
+
+    var label = document.createElement("label");
+    label.appendChild(checkbox);
+    label.appendChild(document.createTextNode("Option " + (tbody.rows.length)));
+
+    checkboxCell.appendChild(label);
+    nameCell.textContent = "New Name";
+    ageCell.textContent = "New Age";
+  }
+</script>
+
+</body>
+</html>
