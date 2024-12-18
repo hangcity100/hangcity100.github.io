@@ -3,6 +3,8 @@
 var request = indexedDB.open('stackDB',3); //myDataBase    
 var db;
 var storeName='customers3';
+let stockList=[];
+
 
 // 如果数据库版本变化或首次创建时触发
 request.onupgradeneeded = function(event) {
@@ -63,6 +65,9 @@ function inData(){
       };
 }
 
+//function lookUpData(){
+//  checkCheckboxes();
+//}
 // 查询数据
 function lookUpData()
 {    
@@ -114,38 +119,44 @@ function lookUpData()
 }
 function creatTBody(data)
 {  
+  let stocktd=[];
+  stockList=[];
+
+
   //var tbody = document.getElementById("stockTbody").getElementsByTagName('tbody')[0];
   var tbody = document.getElementById("stockTbody")
 
   data.forEach(function(item) {
   //console.log(item);
-  var newRow = tbody.insertRow();
+      var newRow = tbody.insertRow();     
+      stockList.push(item.id);
+      console.log(item.id);
 
-  var checkboxCell = newRow.insertCell(0);
-  var stock1 = newRow.insertCell(1);
-  var stock2 = newRow.insertCell(2);
-  var stock3 = newRow.insertCell(3);
-  var stock4 = newRow.insertCell(4);
-  var stock5 = newRow.insertCell(5);
-  var stock6 = newRow.insertCell(6);
+      for(var i=0;i<7;i++){
+         stocktd[i]=newRow.insertCell(i);
+      }
 
-  var checkbox = document.createElement("input");
-  checkbox.type = "checkbox";
-  checkbox.name = "checkbox" + (tbody.rows.length);
+      var checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.name = "checkbox" 
+      checkbox.value= tbody.rows.length;
+      //console.log(tbody.rows.length);
 
-  var label = document.createElement("label");
-  label.appendChild(checkbox);
-  //label.appendChild(document.createTextNode("Option " + (tbody.rows.length)));
+      var label = document.createElement("label");
+      label.appendChild(checkbox);  
+      //checkboxCell.appendChild(label);
+      stocktd[0].appendChild(label);
 
-  checkboxCell.appendChild(label);
-  stock1.textContent = item.stackNo;
-  stock2.textContent = item.name;
-  stock3.textContent = item.date;
-  stock4.textContent = item.amount;
-  stock5.textContent = item.stocknum;
-  stock6.textContent = item.amount*item.stocknum;
+      var stockIndex=[item.stackNo,item.name,item.date,item.amount,item.stocknum,item.amount*item.stocknum];
+
+      
+      for(var i=1;i<7;i++){
+          stocktd[i].textContent=stockIndex[i-1]; 
+      }     
   })
 } 
+
+
 function clearTBody() 
 {
   //var table=document.getElementById('stockTable');
@@ -236,9 +247,9 @@ function upData(){
 * @param {string} storeName 仓库名称
 * @param {object} id 主键值
 */
-function deleteData(storeName) {
-var inputElement = document.getElementById("stockNo");      
-var id = inputElement.value;
+function deleteData(storeName,id) {
+var inputElement = document.getElementById("id");      
+//var id = inputElement.value;
 
 var request = db
   .transaction([storeName], "readwrite")
@@ -247,12 +258,77 @@ var request = db
 
   request.onsuccess = function () {
     console.log("数据删除成功");
-    clearTBody();
-    creatAthead(); //創建一個表頭
-    cursorGetData(db,storeName);  
+    //clearTBody();
+    //creatAthead(); //創建一個表頭
+    //cursorGetData(db,storeName);  
   };
 
   request.onerror = function () {
     console.log("数据删除失败");
+  };
+}
+function disAll(){
+    clearTBody();
+    cursorGetData(db,storeName);
+}
+
+function checkCheckboxes() { 
+  var checkboxes = document.querySelectorAll('input[name="checkbox"]:checked'); 
+  //var selectedValues = []; 
+  console.log(stockList);
+  checkboxes.forEach(function(checkbox) { 
+    //selectedValues.push(checkbox.value); 
+    console.log(stockList[checkbox.value-1]);
+    deleteData(storeName,stockList[checkbox.value-1]);
+  }); 
+  clearTBody();
+  cursorGetData(db,storeName);
+
+  //alert("Selected values: " + selectedValues.join(", "));
+  
+}
+
+function sell()
+{
+    var checkboxes = document.querySelectorAll('input[name="checkbox"]:checked');
+
+    console.log("清單中被選到的",stockList);    
+    console.log(checkboxes[0]);
+    if(checkboxes[0]!=undefined)
+    {  
+        var sellNo=stockList[checkboxes[0].value-1];
+        console.log("賣出股票id值:",sellNo);
+        listSellItem(sellNo);   
+    }
+    else  alert("請勾選要賣出的項目" );
+}
+
+function listSellItem( id) {
+  var list;
+  var sell_item=["stockName","stockNo","transDate","transAmount","stockNum"]
+ 
+  var store = db.transaction(storeName, "readwrite").objectStore(storeName); // 仓库对象
+  var request = store
+    .index('id') // 索引对象
+    .openCursor(IDBKeyRange.only(id)); // 指针对象    
+  request.onsuccess = function (e) {
+    var cursor = e.target.result;    
+    if (cursor) {
+      // 必须要检查
+      list=cursor.value;           
+      console.log(list);      
+      var stockIndex=[list.name,list.stackNo,list.date,list.amount,list.stocknum];
+
+      for(var i=0;i<5;i++){
+          var cell=document.getElementById(sell_item[i]);
+          var jj=stockIndex[i];
+          cell.value=jj;
+      }
+    } else {
+      console.log("查詢完成");     
+    }
+  };
+  request.onerror = function (e) {
+    console.log('請勾選要賣出的項目');
   };
 }

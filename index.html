@@ -34,25 +34,25 @@
         <label >
           <input type="radio" id="buy" name="buy_sell" value="buy" checked>
           買入
-        </label> <br>
+        </label> 
         <label >
-          <input type="radio" id="sell" name="buy_sell" value="sell">
+          <input type="radio" onclick="sell()" id="sell" name="buy_sell" value="sell">
           賣出
-        </label>    
+        </label><br>
       </div>
       <span>        
           <!--<span>股票名稱</span>-->
           <label >股票名稱
-              <input type="text" id="stockName" name="stockName">          
+              <input type="text" id="stockName" name="stockName"><br>
           </label>
           <label >股票代號
-              <input type="text" id="stockNo" name="stockNo">   
+              <input type="text" id="stockNo" name="stockNo"><br>
           </label>
           <label >交易日期
-              <input type="text" id="transDate" name="transDate">   
+              <input type="text" id="transDate" name="transDate"><br>   
           </label>
-          <label >成交價
-              <input type="text" id="transAmount" name="transAmount">
+          <label >成交價格
+              <input type="text" id="transAmount" name="transAmount"><br>
           </label>
           <label >交易股數
               <input type="text" id="stockNum" name="stockNum">
@@ -60,11 +60,11 @@
       <span>
   </div>
 
-  <div>
-    <button onclick="inData()">加入</button>
-    <button onclick="lookUpData()">查詢</button>
-    <button onclick="upData()">更新</button>
-    <button onclick="deleteData('customers')">刪除</button>
+  <div class="btn-group" style="width: 100%">
+    <button style="width: 10%" onclick="inData()">確認</button>
+    <button style="width: 10%" onclick="lookUpData()">查詢</button>    
+    <button style="width: 10%" onclick="checkCheckboxes()">刪除</button>
+    <button style="width: 10%" onclick="disAll()">全顯</button>
   </div>      
 
   <div id="findStock"></div> 
