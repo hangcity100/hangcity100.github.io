@@ -332,3 +332,31 @@ function listSellItem( id) {
     console.log('請勾選要賣出的項目');
   };
 }
+
+function readTWSE(no) {      
+  var stockNo=document.getElementById('stockNo');                
+  var stockName=document.getElementById('stockName');    
+  if(no==0) id=stockNo.value;
+  else      id=stockName.value;            
+
+  console.log(id);
+  var linkElement = document.getElementById('textFileLink');
+  var filePath = linkElement.getAttribute('href');
+
+  fetch(filePath)
+    .then(response => response.text())
+    .then(data => {            
+      data = data.split('\n');        
+      var splitDataArray = data.map(function(item) {          
+        var list=item.split(/\s+/);
+        if(list[no]==id) {
+            if(no==0) stockName.value=list[1];
+            else      stockNo.value=list[0];
+        }
+        //console.log(list[no]);        
+      });                   
+    })      
+    .catch(error => {
+      console.error("Error reading file:", error);
+    });            
+}

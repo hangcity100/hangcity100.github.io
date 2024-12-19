@@ -3,7 +3,7 @@
         display: flex;
         align-items:center;
         font-family: 'Tangerine', serif;
-        font-size: 30px;
+        font-size: 24px;
         font-weight:bolder;
         text-shadow: 4px 4px 4px rgb(200, 0, 125);
         color: blue;
@@ -18,12 +18,12 @@
         align-content: center;
 }
 .buysell span label{
-        font-size: 12px;
+        font-size: 8px;
         color: red;
         font-weight: bold;
 }
 .container span{        
-        font-size:13px;
+        font-size:10px;
         color: black;       
         }              
 

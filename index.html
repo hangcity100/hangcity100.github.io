@@ -14,6 +14,7 @@
     -->
 
     <title>[翰哥Hange]</title>    
+    <link rel="text" type="text" href="../data/TWSE.txt" id="textFileLink">
     <link rel="stylesheet" type="text/css" href="./cssSheet.css"> 
     <link rel="stylesheet" htef="https://fonts.googleapis.com/css?family=Rancho&effect=shadow-multiple|3d-float">               
     <link rel="stylesheet" type="text/css" href="./myCSS.css" >                  
@@ -43,10 +44,10 @@
       <span>        
           <!--<span>股票名稱</span>-->
           <label >股票名稱
-              <input type="text" id="stockName" name="stockName"><br>
+              <input type="text" onclick="readTWSE(1)" id="stockName" name="stockName"><br>
           </label>
           <label >股票代號
-              <input type="text" id="stockNo" name="stockNo"><br>
+              <input type="text" onclick="readTWSE(0)" id="stockNo" name="stockNo"><br>
           </label>
           <label >交易日期
               <input type="text" id="transDate" name="transDate"><br>   
