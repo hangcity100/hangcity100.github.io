@@ -39,19 +39,63 @@ function inData(){
       var transaction = db.transaction([storeName], 'readwrite');
       var objectStore = transaction.objectStore(storeName);
 
-      var inputElement = document.getElementById("stockNo");
       var inputStockName=document.getElementById("stockName");
+      var inputElement = document.getElementById("stockNo");
       var transDate=document.getElementById("transDate");
       var transAmount=document.getElementById("transAmount");
       var stockNum=document.getElementById("stockNum");
 
-      var inputValue = inputElement.value;
       var stockName=inputStockName.value
-      var transAmount=transAmount.value;
-      var transDate=transDate.value;
-      var stockNum=stockNum.value;
+      var inputValue = inputElement.value;
+      var transDateValue=transDate.value;
+      var transAmountValue=transAmount.value;
+      var stockNumValue=stockNum.value;
 
-      objectStore.add({ stackNo: inputValue , name: stockName,date: transDate, amount:transAmount, stocknum:stockNum  });          
+      /* Ensure none of all inputs is emptys */
+
+      if(stockName == "") {
+        console.log('Stock Name is empty!');
+        alert('股票名稱不能為空白!');
+        inputStockName.focus();
+        return;
+      }
+
+      if(inputValue == "") {
+        console.log('Stock Code is empty!');
+        alert('股票代號不能為空白!');
+        inputElement.focus();
+        return;
+      }
+
+      if(transDateValue == "") {
+        console.log('TransDate is empty!');
+        alert('交易日期不能為空白!');
+        transDate.focus();
+        return;
+      }
+
+      if(transAmountValue == "") {
+        console.log('TransAmount is empty!');
+        alert('成交價格不能為空白!');
+        transAmount.focus();
+        return;
+      }
+
+      if(stockNumValue == "") {
+        console.log('StockNum is empty!');
+        alert('交易股數不能為空白!');
+        stockNum.focus();
+        return;
+      }
+
+      /* Ensure all inputs not blanks */
+
+      objectStore.add({ 
+        stackNo: inputValue , 
+        name: stockName,
+        date: transDateValue, 
+        amount:transAmountValue, 
+        stocknum:stockNumValue  });  
 
       transaction.oncomplete = function() {
       console.log('已經存入資料!');
