@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+<script>    
+  const stockCode = "2330"; // 台積電
+const url = `https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_${stockCode}.tw&json=1&delay=0`;
+
+async function getTWSEStockPrice(code) {
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data && data.msgArray && data.msgArray.length > 0) {
+      const stock = data.msgArray[0];
+      console.log(`股票名稱: ${stock.n}`);
+      console.log(`股票代號: ${stock.c}`);
+      console.log(`成交價: ${stock.z}`);
+    } else {
+      console.log("查無資料，可能是代號錯誤或非交易時間");
+    }
+  } catch (error) {
+    console.error("讀取股價失敗:", error);
+  }
+}
+
+getTWSEStockPrice(stockCode);
+
+</script>
+</body>
+
+</html>
