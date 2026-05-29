@@ -1,40 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Read Text File and Display as JSON</title>
+  <meta charset="utf-8">
+  <title>LIFF測試</title>
+
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
+
 <body>
 
-<link rel="text" type="text" href="../data/TWSE.txt" id="textFileLink">
-
-<button onclick="readTextFile()">Read Text File</button>
+<h1>LIFF 啟動成功</h1>
 
 <script>
-  
-  function readTextFile() {    
-    var linkElement = document.getElementById('textFileLink');
-    var filePath = linkElement.getAttribute('href');
 
-    fetch(filePath)
-      .then(response => response.text())
-      .then(data => {
-        // Convert the text data to JSON format
-        //var data1 = JSON.parse(data);
-        data = data.split('\n');        
-        var splitDataArray = data.map(function(item) { 
-          //console.log( item.split(/\s+/)); 
-          var list=item.split(/\s+/);
-          //console.log(list);
-          if(list[0]=='3481') console.log(list[1]);
-        });                   
-      })      
-      .catch(error => {
-        console.error("Error reading file:", error);
-      });            
+async function main() {
+
+  await liff.init({
+    liffId: "你的LIFFID"
+  });
+
+  if (!liff.isLoggedIn()) {
+    liff.login();
   }
 
+  const profile = await liff.getProfile();
+
+  document.body.innerHTML +=
+    "<p>歡迎：" + profile.displayName + "</p>";
+}
+
+main();
 
 </script>
+
+</body>
+</html>
 
 </body>
 </html>
