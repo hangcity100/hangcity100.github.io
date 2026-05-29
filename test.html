@@ -1,38 +1,118 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-TW">
 <head>
   <meta charset="utf-8">
-  <title>LIFF測試</title>
-
+  <title>永勝關東煮點餐系統</title>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    body {
+      font-family: "Microsoft JhengHei", sans-serif;
+      background-color: #fff8e1;
+      margin: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #d32f2f;
+    }
+    .menu-section {
+      margin-bottom: 20px;
+      border: 2px solid #ffcc80;
+      border-radius: 10px;
+      padding: 10px;
+      background-color: #fff3e0;
+    }
+    .menu-section h2 {
+      color: #ef6c00;
+      border-bottom: 1px solid #ef6c00;
+    }
+    .item {
+      display: flex;
+      justify-content: space-between;
+      margin: 5px 0;
+    }
+    .item input {
+      width: 60px;
+      text-align: center;
+    }
+    #total {
+      font-size: 20px;
+      color: #d32f2f;
+      font-weight: bold;
+      text-align: center;
+    }
+    button {
+      background-color: #ff7043;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #f4511e;
+    }
+  </style>
 </head>
 
 <body>
+  <h1>永勝關東煮點餐系統</h1>
+  <div id="profile"></div>
 
-<h1>LIFF 啟動成功</h1>
+  <div class="menu-section" id="menu">
+    <h2>關東煮類</h2>
+    <div class="item"><span>黑輪</span><input type="number" min="0" value="0" data-price="10"></div>
+    <div class="item"><span>米血</span><input type="number" min="0" value="0" data-price="10"></div>
+    <div class="item"><span>魚板</span><input type="number" min="0" value="0" data-price="10"></div>
+    <div class="item"><span>豬皮</span><input type="number" min="0" value="0" data-price="10"></div>
+    <div class="item"><span>菜頭</span><input type="number" min="0" value="0" data-price="10"></div>
+    <div class="item"><span>真丸</span><input type="number" min="0" value="0" data-price="10"></div>
+    <div class="item"><span>魚豆腐</span><input type="number" min="0" value="0" data-price="10"></div>
+    <div class="item"><span>北海貝(2個)</span><input type="number" min="0" value="0" data-price="15"></div>
+    <div class="item"><span>龍蝦棒</span><input type="number" min="0" value="0" data-price="15"></div>
+    <div class="item"><span>苦瓜封</span><input type="number" min="0" value="0" data-price="15"></div>
+  </div>
 
-<script>
+  <div id="total">合計：NT$0</div>
+  <div style="text-align:center;">
+    <button onclick="calculateTotal()">計算金額</button>
+    <button onclick="sendOrder()">送出訂單</button>
+  </div>
 
-async function main() {
+  <script>
+    async function main() {
+      await liff.init({ liffId: "你的LIFFID" });
+      if (!liff.isLoggedIn()) {
+        liff.login();
+      }
+      const profile = await liff.getProfile();
+      document.getElementById("profile").innerHTML = "<p>歡迎：" + profile.displayName + "</p>";
+    }
 
-  await liff.init({
-    liffId: "你的LIFFID"
-  });
+    function calculateTotal() {
+      let total = 0;
+      document.querySelectorAll("#menu input").forEach(input => {
+        total += input.value * input.dataset.price;
+      });
+      document.getElementById("total").innerText = "合計：NT$" + total;
+    }
 
-  if (!liff.isLoggedIn()) {
-    liff.login();
-  }
+    function sendOrder() {
+      let order = [];
+      document.querySelectorAll("#menu .item").forEach(item => {
+        const name = item.querySelector("span").innerText;
+        const qty = item.querySelector("input").value;
+        if (qty > 0) order.push(`${name} x${qty}`);
+      });
+      const total = document.getElementById("total").innerText;
+      const message = "您的訂單：\n" + order.join("\n") + "\n" + total;
+      liff.sendMessages([{ type: "text", text: message }])
+        .then(() => alert("訂單已送出！"))
+        .catch(err => alert("送出失敗：" + err));
+    }
 
-  const profile = await liff.getProfile();
-
-  document.body.innerHTML +=
-    "<p>歡迎：" + profile.displayName + "</p>";
-}
-
-main();
-
-</script>
-
+    main();
+  </script>
 </body>
 </html>
 
