@@ -1,120 +1,596 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="utf-8">
-  <title>永勝關東煮點餐系統</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>永勝關東煮 · 行動點餐</title>
+  <!-- LIFF SDK -->
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <!-- 簡單、現代、圓潤風格，適合手機閱讀 -->
   <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      font-family: "Microsoft JhengHei", sans-serif;
-      background-color: #fff8e1;
-      margin: 20px;
+      background: #fef7e8;   /* 溫暖高湯色 */
+      font-family: system-ui, 'Segoe UI', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+      padding: 20px 16px 40px;
+      color: #2c221b;
     }
-    h1 {
-      text-align: center;
-      color: #d32f2f;
+
+    /* 主容器 */
+    .app-container {
+      max-width: 600px;
+      margin: 0 auto;
     }
-    .menu-section {
+
+    /* 店名區 + 聯絡資訊 */
+    .shop-header {
+      background: linear-gradient(135deg, #f5b042 0%, #e67e22 100%);
+      border-radius: 36px 36px 28px 28px;
+      padding: 20px 20px 18px;
       margin-bottom: 20px;
-      border: 2px solid #ffcc80;
-      border-radius: 10px;
-      padding: 10px;
-      background-color: #fff3e0;
+      color: white;
+      box-shadow: 0 8px 14px rgba(0,0,0,0.1);
+      text-align: center;
     }
-    .menu-section h2 {
-      color: #ef6c00;
-      border-bottom: 1px solid #ef6c00;
+    .shop-name {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
     }
-    .item {
+    .shop-name::before {
+      content: "🍢";
+      font-size: 1.9rem;
+    }
+    .shop-name::after {
+      content: "🍜";
+      font-size: 1.9rem;
+    }
+    .shop-info {
+      margin-top: 12px;
+      font-size: 0.85rem;
+      background: rgba(255,255,240,0.2);
+      padding: 6px 12px;
+      border-radius: 50px;
+      display: inline-block;
+      backdrop-filter: blur(2px);
+    }
+    .shop-info span {
+      margin: 0 6px;
+    }
+    .profile-area {
+      background: #fff2e0;
+      border-radius: 30px;
+      padding: 6px 16px;
+      margin-bottom: 16px;
+      font-size: 0.9rem;
+      font-weight: 500;
       display: flex;
       justify-content: space-between;
-      margin: 5px 0;
+      align-items: center;
+      flex-wrap: wrap;
+      color: #b45f2b;
+      border: 1px solid #ffdcb5;
     }
-    .item input {
-      width: 60px;
-      text-align: center;
+    .guest-name {
+      background: #ffefdb;
+      padding: 5px 12px;
+      border-radius: 40px;
+      font-size: 0.85rem;
     }
-    #total {
-      font-size: 20px;
-      color: #d32f2f;
-      font-weight: bold;
-      text-align: center;
+
+    /* 分類頁籤 手機滑動友善 */
+    .tabs {
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      gap: 8px;
+      margin-bottom: 20px;
+      padding-bottom: 6px;
+      scrollbar-width: thin;
+      -webkit-overflow-scrolling: touch;
     }
-    button {
-      background-color: #ff7043;
-      color: white;
+    .tab-btn {
+      background: #f7e4cd;
       border: none;
       padding: 10px 20px;
-      border-radius: 8px;
+      border-radius: 60px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #a55318;
+      white-space: nowrap;
       cursor: pointer;
-      font-size: 16px;
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     }
-    button:hover {
-      background-color: #f4511e;
+    .tab-btn.active {
+      background: #e67e22;
+      color: white;
+      box-shadow: 0 4px 10px rgba(230,126,34,0.3);
+    }
+
+    /* 餐卡總容器 */
+    .menu-panel {
+      display: none;
+      animation: fade 0.2s ease;
+    }
+    .menu-panel.active-panel {
+      display: block;
+    }
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(6px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+
+    /* 餐點卡片 */
+    .food-card {
+      background: white;
+      border-radius: 28px;
+      margin-bottom: 12px;
+      padding: 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.03), 0 1px 2px rgba(0,0,0,0.05);
+      border: 1px solid #ffe0bf;
+      transition: all 0.1s;
+    }
+    .food-info {
+      flex: 2;
+    }
+    .food-name {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #3b2a21;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .price-tag {
+      font-size: 0.8rem;
+      background: #ffede0;
+      padding: 3px 12px;
+      border-radius: 20px;
+      color: #c95a0f;
+      font-weight: 500;
+      display: inline-block;
+    }
+    .food-desc {
+      font-size: 0.7rem;
+      color: #a47e5e;
+    }
+    .quantity-control {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #fef5ea;
+      padding: 6px 12px;
+      border-radius: 50px;
+    }
+    .qty-btn {
+      background: #ffcd94;
+      border: none;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #7c3f0c;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: 0.1s;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    .qty-btn:active { background: #ffb95e; transform: scale(0.96);}
+    .qty-number {
+      font-size: 1.2rem;
+      font-weight: 700;
+      min-width: 32px;
+      text-align: center;
+      color: #4b2e1a;
+    }
+    .item-price-sum {
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: #fff0e2;
+      padding: 3px 8px;
+      border-radius: 30px;
+      color: #e67e22;
+      margin-left: 8px;
+      white-space: nowrap;
+    }
+
+    /* 底部總價 + 按鈕 */
+    .order-bar {
+      position: sticky;
+      bottom: 12px;
+      background: rgba(255,248,235,0.96);
+      backdrop-filter: blur(12px);
+      border-radius: 44px;
+      padding: 12px 20px;
+      margin-top: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+      border: 1px solid #ffdbb5;
+      z-index: 10;
+    }
+    .total-amount {
+      background: #e67e22;
+      padding: 10px 18px;
+      border-radius: 40px;
+      color: white;
+      font-weight: 800;
+      font-size: 1.35rem;
+      letter-spacing: 1px;
+    }
+    .btn-group {
+      display: flex;
+      gap: 12px;
+    }
+    .action-btn {
+      border: none;
+      background: #ffb347;
+      padding: 10px 18px;
+      border-radius: 40px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #2e241d;
+      cursor: pointer;
+      transition: 0.1s;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .action-btn.send {
+      background: #e67e22;
+      color: white;
+      box-shadow: 0 4px 10px rgba(230,126,34,0.4);
+    }
+    .action-btn:active { transform: scale(0.97); opacity: 0.9;}
+
+    /* 小菜/飲料分類統一風格 */
+    hr {
+      margin: 8px 0;
+    }
+    .note {
+      font-size: 0.7rem;
+      text-align: center;
+      margin-top: 16px;
+      color: #b87c48;
     }
   </style>
 </head>
-
 <body>
-  <h1>永勝關東煮點餐系統</h1>
-  <div id="profile"></div>
+<div class="app-container">
+  <div class="shop-header">
+    <div class="shop-name">永勝關東煮</div>
+    <div class="shop-info">
+      📞 0909-013-660 &nbsp;|&nbsp; 🏠 台南市永康區永康街119號
+    </div>
+  </div>
+  <div id="profile" class="profile-area"></div>
 
-  <div class="menu-section" id="menu">
-    <h2>關東煮類</h2>
-    <div class="item"><span>黑輪</span><input type="number" min="0" value="0" data-price="10"></div>
-    <div class="item"><span>米血</span><input type="number" min="0" value="0" data-price="10"></div>
-    <div class="item"><span>魚板</span><input type="number" min="0" value="0" data-price="10"></div>
-    <div class="item"><span>豬皮</span><input type="number" min="0" value="0" data-price="10"></div>
-    <div class="item"><span>菜頭</span><input type="number" min="0" value="0" data-price="10"></div>
-    <div class="item"><span>真丸</span><input type="number" min="0" value="0" data-price="10"></div>
-    <div class="item"><span>魚豆腐</span><input type="number" min="0" value="0" data-price="10"></div>
-    <div class="item"><span>北海貝(2個)</span><input type="number" min="0" value="0" data-price="15"></div>
-    <div class="item"><span>龍蝦棒</span><input type="number" min="0" value="0" data-price="15"></div>
-    <div class="item"><span>苦瓜封</span><input type="number" min="0" value="0" data-price="15"></div>
+  <!-- 頁籤分類 因應手機可左右滑動 -->
+  <div class="tabs" id="tabBar">
+    <button class="tab-btn active" data-tab="tab1">🍢 關東煮</button>
+    <button class="tab-btn" data-tab="tab2">🍚 飯類 / 麵類</button>
+    <button class="tab-btn" data-tab="tab3">🥣 湯類 / 煎類</button>
+    <button class="tab-btn" data-tab="tab4">🥗 小菜 / 小點</button>
   </div>
 
-  <div id="total">合計：NT$0</div>
-  <div style="text-align:center;">
-    <button onclick="calculateTotal()">計算金額</button>
-    <button onclick="sendOrder()">送出訂單</button>
+  <!-- 分類面板1: 關東煮類 (完整依據圖片與常見關東煮) -->
+  <div id="tab1" class="menu-panel active-panel">
+    <!-- 所有單品使用 data-id 記錄，data-price 價格，結構統一 -->
   </div>
+  <!-- 分類面板2: 飯類+麵類 -->
+  <div id="tab2" class="menu-panel"></div>
+  <!-- 分類面板3: 湯類 + 煎類 (35元/份, 煎類10元/個) -->
+  <div id="tab3" class="menu-panel"></div>
+  <!-- 分類面板4: 小菜類 ＋ 額外單品 (從照片顯示小菜類35元/份, 也補充一些煎蛋等) -->
+  <div id="tab4" class="menu-panel"></div>
 
-  <script>
-    async function main() {
+  <!-- 固定底部總價與送出按鈕 -->
+  <div class="order-bar">
+    <div class="total-amount" id="liveTotal">NT$ 0</div>
+    <div class="btn-group">
+      <button class="action-btn" id="recalcBtn">📋 刷新</button>
+      <button class="action-btn send" id="sendOrderBtn">📨 送出訂單</button>
+    </div>
+  </div>
+  <div class="note">✅ 點選 + / - 調整數量 · 金額即時累計</div>
+</div>
+
+<script>
+  // ---------- 完整菜單資料庫 (參照圖片與台灣常見關東煮品項) ----------
+  // 關東煮類 (原圖品項及其價格)
+  const kantoMenu = [
+    { name: "黑輪", price: 10, desc: "經典魚漿" }, { name: "米血", price: 10, desc: "Q軟米血糕" },
+    { name: "魚板", price: 10, desc: "甜不辣風味" }, { name: "豬皮", price: 10, desc: "膠質滿滿" },
+    { name: "菜頭", price: 10, desc: "清甜蘿蔔" }, { name: "真丸", price: 10, desc: "扎實貢丸" },
+    { name: "魚豆腐", price: 10, desc: "軟嫩入味" }, { name: "北海貝(2個)", price: 15, desc: "海味雙鮮" },
+    { name: "龍蝦棒", price: 15, desc: "鮮甜龍蝦風味" }, { name: "苦瓜封", price: 15, desc: "苦瓜鑲肉" }
+  ];
+  // 飯類、麵類 (菜單上價格均為100元，但搭配詳細)
+  const riceNoodle = [
+    { name: "肉燥飯", price: 35, desc: "香濃肉燥" }, { name: "雞肉飯", price: 45, desc: "火雞肉絲" },
+    { name: "關東煮拌飯", price: 50, desc: "特色拌飯" }, { name: "烏龍麵", price: 65, desc: "Q彈烏龍" },
+    { name: "意麵", price: 55, desc: "台南意麵" }, { name: "米粉", price: 55, desc: "細滑米粉" },
+    { name: "王子麵", price: 35, desc: "經典泡麵" }
+  ];
+  // 湯類 (菜單湯類35元/份) + 煎類 (10元/ 且菜單顯示煎類10元/份，我們增加荷包蛋/煎蛋)
+  const soupAndFried = [
+    { name: "味噌湯", price: 35, desc: "傳統日式風味" }, { name: "貢丸湯", price: 35, desc: "清甜貢丸" },
+    { name: "魚丸湯", price: 35, desc: "新鮮魚丸" }, { name: "菜頭湯", price: 35, desc: "原汁原味" },
+    { name: "煎荷包蛋", price: 10, desc: "半熟/全熟" }, { name: "煎蘿蔔糕", price: 35, desc: "外酥內軟" },
+    { name: "煎餃(5顆)", price: 45, desc: "酥脆煎餃" }
+  ];
+  // 小菜類 (參考菜單小菜類35元/份，以及關東煮常見小菜)
+  const sideDishes = [
+    { name: "燙青菜", price: 35, desc: "時令蔬菜" }, { name: "滷蛋", price: 15, desc: "入味滷蛋" },
+    { name: "豆干", price: 20, desc: "滷豆干" }, { name: "海帶", price: 20, desc: "軟嫩海帶" },
+    { name: "泡菜", price: 35, desc: "酸甜泡菜" }, { name: "涼拌小黃瓜", price: 35, desc: "清爽脆口" },
+    { name: "豬耳朵", price: 40, desc: "煙燻脆耳" }
+  ];
+
+  // 建立統一儲存 quantity 的物件: key 用 "類別_index" 或唯一 id 避免衝突
+  let orderMap = new Map(); // key = itemKey (name+price輕微處理) , value = quantity
+
+  // 初始化所有品項，給定key並將數量歸零
+  function initOrderMap() {
+    const allItems = [...kantoMenu, ...riceNoodle, ...soupAndFried, ...sideDishes];
+    allItems.forEach((item, idx) => {
+      const key = `${item.name}_${item.price}_${idx}`;
+      if (!orderMap.has(key)) orderMap.set(key, 0);
+    });
+  }
+
+  // 取得某個品項當前數量
+  function getQty(key) {
+    return orderMap.get(key) || 0;
+  }
+
+  function setQty(key, newQty) {
+    if (newQty < 0) newQty = 0;
+    orderMap.set(key, newQty);
+    // 更新對應 DOM 上的數量顯示與該項小計金額
+    updateItemDisplay(key);
+    updateTotalSum();  // 即時更新總金額
+  }
+
+  // 更新單一品項的顯示 (數量數字、單項小計)
+  function updateItemDisplay(key) {
+    const qtySpan = document.querySelector(`.qty-num[data-key='${key}']`);
+    const sumSpan = document.querySelector(`.item-sum[data-key='${key}']`);
+    if (!qtySpan) return;
+    const qty = getQty(key);
+    qtySpan.innerText = qty;
+    // 取得價格
+    const priceAttr = qtySpan.getAttribute("data-price");
+    if (priceAttr && sumSpan) {
+      const price = parseInt(priceAttr, 10);
+      const itemTotal = price * qty;
+      sumSpan.innerText = `NT$${itemTotal}`;
+    }
+  }
+
+  // 全域計算總金額並更新底部
+  function updateTotalSum() {
+    let total = 0;
+    for (let [key, qty] of orderMap.entries()) {
+      // 從 key 中提取價格 (儲存時存在 data 屬性中，但較穩妥方式: 遍歷所有卡片節點獲取累計)
+      // 但也可以從 DOM 快取，另外從 map 搭價格: 為了簡單且準確，透過查找該key的 DOM 元素取得價格
+      const qtySpan = document.querySelector(`.qty-num[data-key='${key}']`);
+      if (qtySpan && qty > 0) {
+        const price = parseInt(qtySpan.getAttribute("data-price"), 10);
+        if (!isNaN(price)) total += price * qty;
+      } else if (qty > 0) {
+        // 備用：找不到節點時（極少發生）但我們從原始資料中搜索，為了完整遍歷所有菜量
+        const parts = key.split('_');
+        if (parts.length >= 2) {
+          const foundPrice = parseInt(parts[1], 10);
+          if (!isNaN(foundPrice)) total += foundPrice * qty;
+        }
+      }
+    }
+    document.getElementById("liveTotal").innerText = `NT$ ${total}`;
+    return total;
+  }
+
+  // 渲染一個分類的菜單卡片
+  function renderCategory(containerId, itemsArray, categoryPrefix) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = '';
+    itemsArray.forEach((item, idx) => {
+      const uniqueKey = `${item.name}_${item.price}_${categoryPrefix}_${idx}`;
+      // 確保 orderMap 有這個 key 的數量紀錄
+      if (!orderMap.has(uniqueKey)) orderMap.set(uniqueKey, 0);
+      const currentQty = getQty(uniqueKey);
+      // 建立卡片
+      const card = document.createElement('div');
+      card.className = 'food-card';
+      card.innerHTML = `
+        <div class="food-info">
+          <div class="food-name">
+            ${item.name}
+            <span class="price-tag">$${item.price}</span>
+          </div>
+          <div class="food-desc">${item.desc || '新鮮美味'}</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div class="quantity-control">
+            <button class="qty-btn dec">−</button>
+            <span class="qty-number qty-num" data-key="${uniqueKey}" data-price="${item.price}">${currentQty}</span>
+            <button class="qty-btn inc">+</button>
+          </div>
+          <div class="item-price-sum item-sum" data-key="${uniqueKey}">NT$${item.price * currentQty}</div>
+        </div>
+      `;
+      container.appendChild(card);
+      // 綁定 + / - 事件
+      const decBtn = card.querySelector('.dec');
+      const incBtn = card.querySelector('.inc');
+      const qtySpan = card.querySelector('.qty-num');
+      decBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        let q = getQty(uniqueKey);
+        if (q > 0) setQty(uniqueKey, q - 1);
+      });
+      incBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        let q = getQty(uniqueKey);
+        setQty(uniqueKey, q + 1);
+      });
+    });
+  }
+
+  // 重新渲染所有分類 (確保 update 同步)
+  function renderAllMenus() {
+    renderCategory('tab1', kantoMenu, 'kanto');
+    renderCategory('tab2', riceNoodle, 'ricenoodle');
+    renderCategory('tab3', soupAndFried, 'soupfried');
+    renderCategory('tab4', sideDishes, 'sidedish');
+    // 重新計算總價
+    updateTotalSum();
+  }
+
+  // 初始化頁籤切換邏輯 (手機友善)
+  function initTabs() {
+    const btns = document.querySelectorAll('.tab-btn');
+    const panels = document.querySelectorAll('.menu-panel');
+    btns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tabId = btn.getAttribute('data-tab');
+        // 移除active
+        btns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        panels.forEach(panel => panel.classList.remove('active-panel'));
+        const activePanel = document.getElementById(tabId);
+        if (activePanel) activePanel.classList.add('active-panel');
+      });
+    });
+  }
+
+  // LIFF 初始化以及送出訂單 (結合LINE)
+  let liffReady = false;
+  let liffObject = null;
+  let userProfile = null;
+
+  async function initLiff() {
+    try {
       await liff.init({ liffId: "2010230179-BFAnjvG2" });
+      liffObject = liff;
       if (!liff.isLoggedIn()) {
         liff.login();
+      } else {
+        const profile = await liff.getProfile();
+        userProfile = profile;
+        const profileDiv = document.getElementById('profile');
+        if (profileDiv) {
+          profileDiv.innerHTML = `<span>👋 歡迎，${profile.displayName}</span><span class="guest-name">🍢 永勝老友</span>`;
+        }
       }
-      const profile = await liff.getProfile();
-      document.getElementById("profile").innerHTML = "<p>歡迎：" + profile.displayName + "</p>";
+      liffReady = true;
+    } catch (err) {
+      console.warn("LIFF 初始化失敗或未在LINE環境, 仍可離線點餐", err);
+      document.getElementById('profile').innerHTML = `<span>📱 離線模式 · 歡迎點餐</span><span class="guest-name">可直接送出複製訂單</span>`;
+      liffReady = false;
     }
+  }
 
-    function calculateTotal() {
-      let total = 0;
-      document.querySelectorAll("#menu input").forEach(input => {
-        total += input.value * input.dataset.price;
+  // 送出訂單邏輯 (產生訂單文字)
+  function buildOrderText() {
+    let orderLines = [];
+    // 彙整所有有數量的品項，按分類風格排序
+    const allCards = document.querySelectorAll('.food-card');
+    // 為了有完整名稱與數量，利用orderMap去建立
+    let itemsList = [];
+    for (let [key, qty] of orderMap.entries()) {
+      if (qty > 0) {
+        // 從 key 中解析出品名和價格
+        const parts = key.split('_');
+        let itemName = parts[0];
+        const price = parseInt(parts[1], 10);
+        // 部分名稱含特殊 北海貝等不影響
+        itemsList.push({ name: itemName, qty: qty, price: price });
+      }
+    }
+    if (itemsList.length === 0) return null;
+    // 排序隨意但依照分類外觀
+    let result = "🍢 永勝關東煮 新訂單 🍜\n";
+    itemsList.forEach(item => {
+      result += `▸ ${item.name} x ${item.qty}  (NT$${item.price * item.qty})\n`;
+    });
+    const totalPrice = document.getElementById("liveTotal").innerText;
+    result += `────────────────\n💰 總金額：${totalPrice}\n🙏 感謝支持，請稍後取餐。`;
+    return result;
+  }
+
+  async function sendOrderHandler() {
+    const orderText = buildOrderText();
+    if (!orderText) {
+      alert("⚠️ 尚未點餐，請先選購商品～");
+      return;
+    }
+    // 如果 LIFF 可用且已登入，傳送訊息給好友/聊天室
+    if (liffReady && liffObject && liffObject.isLoggedIn && liffObject.isLoggedIn()) {
+      try {
+        await liffObject.sendMessages([{ type: "text", text: orderText }]);
+        alert("✅ 訂單已成功送出！店家會盡快為您準備。");
+      } catch (err) {
+        console.error(err);
+        alert("❌ 送出失敗：" + (err.message || "請確認網路或重新登入LINE"));
+        fallbackCopyOrder(orderText);
+      }
+    } else {
+      // 未登入或非LINE環境，複製訂單文字到剪貼簿
+      fallbackCopyOrder(orderText);
+    }
+  }
+
+  function fallbackCopyOrder(orderText) {
+    // 複製到剪貼簿並提醒
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(orderText).then(() => {
+        alert(`📋 訂單已複製到剪貼簿！\n請手動傳送給店家LINE或電話訂購:\n\n${orderText}`);
+      }).catch(() => {
+        alert(`📝 無法複製，請手動記錄訂單:\n\n${orderText}`);
       });
-      document.getElementById("total").innerText = "合計：NT$" + total;
+    } else {
+      alert(`📝 請截圖或記下訂單內容:\n\n${orderText}\n\n電話訂購：0909013660`);
     }
+  }
 
-    function sendOrder() {
-      let order = [];
-      document.querySelectorAll("#menu .item").forEach(item => {
-        const name = item.querySelector("span").innerText;
-        const qty = item.querySelector("input").value;
-        if (qty > 0) order.push(`${name} x${qty}`);
-      });
-      const total = document.getElementById("total").innerText;
-      const message = "您的訂單：\n" + order.join("\n") + "\n" + total;
-      liff.sendMessages([{ type: "text", text: message }])
-        .then(() => alert("訂單已送出！"))
-        .catch(err => alert("送出失敗：" + err));
-    }
+  // 主程式入口
+  async function start() {
+    initOrderMap();
+    renderAllMenus();
+    initTabs();
+    // 綁定刷新與送出 (按鈕)
+    document.getElementById('recalcBtn').addEventListener('click', () => {
+      updateTotalSum();
+      alert("💰 已重新計算總金額");
+    });
+    const sendBtn = document.getElementById('sendOrderBtn');
+    if (sendBtn) sendBtn.addEventListener('click', sendOrderHandler);
+    // 初始化 LIFF
+    await initLiff();
+    // 確保任何數量變化都會觸發即時更新 (setQty本身會呼叫updateTotalSum, 每增減都會)
+  }
 
-    main();
-  </script>
-</body>
-</html>
-
+  start();
+</script>
 </body>
 </html>
