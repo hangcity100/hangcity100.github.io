@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>快速找零計算機｜付款金額＋快速按鈕</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #e0eafc 0%, #cfdef3 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* 主卡片 */
+        .card {
+            max-width: 560px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(0px);
+            border-radius: 56px;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.35), 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 28px 24px 36px;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            margin: 0 0 8px 0;
+            color: #1a2c3e;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        h1:before {
+            content: "💰";
+            font-size: 1.8rem;
+        }
+
+        .sub {
+            color: #4a627a;
+            border-left: 4px solid #3b82f6;
+            padding-left: 14px;
+            margin-bottom: 28px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        /* 輸入群組 */
+        .input-group {
+            margin-bottom: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .label {
+            font-weight: 600;
+            color: #0f2b3d;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .label span {
+            background: #eef2ff;
+            border-radius: 40px;
+            padding: 2px 10px;
+            font-size: 0.75rem;
+            color: #2563eb;
+        }
+
+        .amount-input {
+            width: 100%;
+            padding: 16px 20px;
+            font-size: 1.5rem;
+            font-weight: 500;
+            border: 2px solid #e2e8f0;
+            border-radius: 44px;
+            background: white;
+            transition: 0.2s;
+            outline: none;
+            text-align: right;
+            letter-spacing: 1px;
+            color: #0f172a;
+        }
+
+        .amount-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+        }
+
+        /* 快捷按鈕區塊 */
+        .quick-section {
+            background: #f8fafc;
+            border-radius: 48px;
+            padding: 18px 16px;
+            margin: 12px 0 20px 0;
+            border: 1px solid #eef2ff;
+        }
+
+        .quick-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .quick-title i {
+            font-style: normal;
+            font-size: 1.1rem;
+        }
+
+        .button-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .money-btn {
+            background: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 60px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            color: #1e40af;
+            cursor: pointer;
+            transition: 0.15s linear;
+            min-width: 80px;
+            border: 1px solid #cbd5e1;
+            background: linear-gradient(to bottom, #ffffff, #f9f9ff);
+        }
+
+        .money-btn:active {
+            transform: scale(0.96);
+            background: #eef2ff;
+            box-shadow: none;
+        }
+
+        /* 操作按鈕 */
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin: 24px 0 20px;
+            justify-content: space-between;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            flex: 2;
+            padding: 14px 0;
+            border: none;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: white;
+            cursor: pointer;
+            transition: 0.15s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary:active {
+            background: #2563eb;
+            transform: scale(0.97);
+        }
+
+        .btn-reset {
+            background: #f1f5f9;
+            flex: 1;
+            border: 1px solid #cbd5e1;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #334155;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+
+        .btn-reset:active {
+            background: #e2e8f0;
+            transform: scale(0.97);
+        }
+
+        /* 找零結果區 */
+        .result-area {
+            background: #0f172a;
+            border-radius: 48px;
+            padding: 20px 24px;
+            margin-top: 12px;
+            text-align: center;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1), 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .result-label {
+            color: #94a3b8;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        .change-value {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: #facc15;
+            margin: 8px 0 0;
+            word-break: break-word;
+            line-height: 1.2;
+        }
+
+        .error-msg {
+            color: #f97316;
+            font-size: 0.8rem;
+            margin-top: 6px;
+            font-weight: 500;
+        }
+
+        hr {
+            margin: 18px 0 10px;
+            border: none;
+            border-top: 1px solid #e2e8f0;
+        }
+        footer {
+            font-size: 0.7rem;
+            text-align: center;
+            color: #5b6e8c;
+            margin-top: 22px;
+        }
+        @media (max-width: 480px) {
+            .card { padding: 20px 18px; }
+            .money-btn { padding: 10px 14px; min-width: 65px; font-size: 1rem; }
+            .change-value { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>找零助手</h1>
+    <div class="sub">付款金額 - 總金額 = 找零</div>
+
+    <!-- 總金額輸入 -->
+    <div class="input-group">
+        <div class="label">
+            📋 總金額
+            <span>(應付)</span>
+        </div>
+        <input type="number" id="totalAmount" class="amount-input" placeholder="0" value="0" step="1" min="0">
+    </div>
+
+    <!-- 付款金額輸入區 (可直接編輯 + 按鈕累加) -->
+    <div class="input-group">
+        <div class="label">
+            💵 付款金額
+            <span>(實收 / 可手動編輯)</span>
+        </div>
+        <input type="number" id="paidAmount" class="amount-input" placeholder="0" value="0" step="1" min="0">
+    </div>
+
+    <!-- 快速付款按鈕區塊 -->
+    <div class="quick-section">
+        <div class="quick-title">
+            <i>⚡</i> 快速加錢 · 點擊累計
+        </div>
+        <div class="button-grid">
+            <button class="money-btn" data-value="1000">+ $1,000</button>
+            <button class="money-btn" data-value="500">+ $500</button>
+            <button class="money-btn" data-value="100">+ $100</button>
+            <button class="money-btn" data-value="50">+ $50</button>
+            <button class="money-btn" data-value="10">+ $10</button>
+            <button class="money-btn" data-value="1">+ $1</button>
+        </div>
+        <div style="font-size: 0.7rem; color:#475569; margin-top: 12px; text-align: center;">
+            ✨ 按 $500 兩次 → 加 $1000 ; 搭配 $100 一次 → 累加 $1100
+        </div>
+    </div>
+
+    <!-- 主要操作按鈕 -->
+    <div class="action-buttons">
+        <button class="btn-primary" id="calculateBtn">🧾 計算找零</button>
+        <button class="btn-reset" id="resetBtn">⟳ 全部歸零</button>
+    </div>
+
+    <!-- 找零結果顯示區 -->
+    <div class="result-area" id="resultArea">
+        <div class="result-label">找零金額</div>
+        <div class="change-value" id="changeDisplay">0</div>
+        <div id="errorMessage" class="error-msg"></div>
+    </div>
+    <footer>付款金額可手動修改，也可點擊上方按鈕累加。按「計算找零」即顯示結果。</footer>
+</div>
+
+<script>
+    // --- DOM 元素 ---
+    const totalInput = document.getElementById('totalAmount');
+    const paidInput = document.getElementById('paidAmount');
+    const calculateBtn = document.getElementById('calculateBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const changeDisplaySpan = document.getElementById('changeDisplay');
+    const errorMsgSpan = document.getElementById('errorMessage');
+
+    // 快速按鈕的 data-value 對應數值
+    const moneyButtons = document.querySelectorAll('.money-btn');
+
+    // 輔助: 取得目前付款金額的數值 (Number, 整數, 若無效則回傳0)
+    function getCurrentPaidValue() {
+        let rawValue = paidInput.value.trim();
+        if (rawValue === "") return 0;
+        let num = Number(rawValue);
+        if (isNaN(num)) return 0;
+        // 為避免負數付款金額，強制轉為非負整數 (付款金額一般不可負，但使用者可能手動輸入負數，我們矯正)
+        if (num < 0) return 0;
+        // 因為金額使用整數計算，但要確保小數點後無關緊要時，我們轉成整數（無條件捨去小數）但是UI允許小數？為了和按鈕一致，按鈕都是整數累加，
+        // 為避免混亂，當使用者輸入小數時，我們保留小數計算也行，但一般找零會精確到小數點後兩位。依照簡易邏輯，允許小數。
+        // 但題目範例都是整數，且按鈕都整數，保留浮點精確至兩位較友善，不做強制整數轉換。
+        return num;
+    }
+
+    // 設定付款金額 (更新input value, 並確保顯示正確數字)
+    function setPaidValue(value) {
+        // 保留兩位小數，但避免過多尾數，若為整數就顯示整數形式
+        let formattedValue;
+        if (Number.isInteger(value)) {
+            formattedValue = value.toString();
+        } else {
+            formattedValue = value.toFixed(2);
+        }
+        paidInput.value = formattedValue;
+        // 觸發手動輸入後清除舊錯誤提示 (可選)
+        clearError();
+    }
+
+    // 獲取總金額 (安全轉數字，默認0)
+    function getTotalValue() {
+        let raw = totalInput.value.trim();
+        if (raw === "") return 0;
+        let num = Number(raw);
+        if (isNaN(num)) return 0;
+        if (num < 0) return 0;   // 總金額不為負數，矯正為0
+        return num;
+    }
+
+    // 清除錯誤訊息與結果區域樣式輔助
+    function clearError() {
+        errorMsgSpan.innerText = "";
+    }
+
+    // 顯示錯誤訊息 (同時清空找零金額顯示? 習慣保留但可設為--)
+    function showError(message) {
+        errorMsgSpan.innerText = message;
+        // 不清空找零顯示，但是可以讓顯示為「--」?
+        // 但為了使用者體驗，若錯誤時可保留上一次或者顯示問號，但依照情境顯示錯誤即可
+    }
+
+    // 核心: 計算找零並更新畫面
+    function calculateChange() {
+        clearError();
+        const total = getTotalValue();
+        const paid = getCurrentPaidValue();
+
+        // 檢查邏輯: 付款金額小於總金額時，找零為負數 (不足額)
+        const change = paid - total;
+        
+        // 格式化金額 (小數點後最多兩位，因為貨幣通常兩位小數)
+        const formatMoney = (num) => {
+            return num.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+        };
+
+        if (change < 0) {
+            // 找零為負表示還欠款，但顯示負數不太直覺，但根據公式: 找零 = 付款-總金額，輸出金額可以負數？在實際情境顯示需補足差額
+            // 題目要求: "輸出:找零(付款金額-總金額)"，所以允許負數結果，但附加提醒。
+            changeDisplaySpan.innerText = `- ${formatMoney(Math.abs(change))}`;
+            showError(`⚠️ 付款不足，尚欠 ${formatMoney(Math.abs(change))} 元`);
+        } else {
+            changeDisplaySpan.innerText = formatMoney(change);
+            if (change === 0) {
+                // 剛好無找零，顯示0且沒有警告
+                errorMsgSpan.innerText = "✔️ 金額恰好，無需找零";
+            } else {
+                // 正常找零，清除錯誤
+                if(errorMsgSpan.innerText.includes("不足")) errorMsgSpan.innerText = "";
+                else errorMsgSpan.innerText = "";
+            }
+        }
+        // 若因為總金額或付款金額非數字時，已經有處理為0，所以不會崩潰
+    }
+
+    // 按鈕累加功能: 每次點擊對應按鈕, 將按鈕面額加到付款金額
+    function addToPaid(amount) {
+        let currentPaid = getCurrentPaidValue();
+        // 避免過大金額上限? 無限制，但理論上使用者不會無限加，安全
+        let newPaid = currentPaid + amount;
+        // 由於計算避免浮點誤差 (金額為整數或小數相加，JS浮點可控)
+        // 但是當 amount 為整數而 currentPaid 有小數時，精準顯示
+        // 使用 Number 並保留小數點後兩位精度，避免0.01累加問題，但這裡按鈕都是整數，所以安全
+        setPaidValue(newPaid);
+        // 點擊後立即清除錯誤提示，但不自動計算找零? 使用者體驗: 可即時自動計算? 不影響，按「計算找零」才計算。
+        // 不過題目未要求即時計算，但友善起見，可在每次累加後自動執行找零計算？然而避免干擾設計，但使用者覺得方便，我們可以附加一個輕量的即時計算？
+        // 依照題意: 最後按找零button則顯示找零金額，所以明確要求最後按找零才輸出。但許多現代設計可點擊自動更新，但沒關係保留手動計算
+        // 為了完美符合規格描述: 顯示找零必須靠「找零button」，我們保持按鈕計算。但累加只更新付款欄位，不自動重新找零。
+        // 但是為了直覺，如果使用者累加後點找零才正確顯示。完全符合規範。
+    }
+
+    // 重置所有欄位: 總金額=0，付款金額=0，找零顯示0, 清除錯誤
+    function resetAll() {
+        totalInput.value = "0";
+        paidInput.value = "0";
+        changeDisplaySpan.innerText = "0";
+        errorMsgSpan.innerText = "";
+        // 確保所有輸入乾淨
+    }
+
+    // 輔助: 綁定快速付款按鈕事件，可處理連續點擊累計 (ex: $500點兩次就是累加1000)
+    function bindQuickButtons() {
+        moneyButtons.forEach(btn => {
+            // 避免重複綁定，先移除再添加 (但無礙)
+            btn.removeEventListener('click', handlerGenerator);
+            btn.addEventListener('click', handlerGenerator);
+        });
+
+        function handlerGenerator(e) {
+            // 從 data-value 取得數字
+            const valueAttr = e.currentTarget.getAttribute('data-value');
+            let addValue = parseInt(valueAttr, 10);
+            if (isNaN(addValue)) return;
+            addToPaid(addValue);
+        }
+    }
+
+    // 另外對於付款金額的手動輸入, 我們加一個輸入監聽檢查負數，並矯正
+    function sanitizePaidInput() {
+        let val = paidInput.value.trim();
+        if (val === "") {
+            paidInput.value = "0";
+            return;
+        }
+        let num = Number(val);
+        if (isNaN(num)) {
+            paidInput.value = "0";
+        } else if (num < 0) {
+            paidInput.value = "0";
+        } else {
+            // 為了保持良好格式，若使用者輸入小數點過多，可以保留兩位但不必強制改值保留原始輸入，但可以正規化
+            // 避免顯示怪異，但不用太激進，保留使用者輸入，僅矯正負數/NaN
+            if (!Number.isInteger(num) && val.includes('.')) {
+                // 保留最多兩位小數
+                let rounded = Math.round(num * 100) / 100;
+                if (rounded !== num) {
+                    paidInput.value = rounded;
+                }
+            }
+        }
+        // 額外檢查總金額負數？
+    }
+    
+    function sanitizeTotalInput() {
+        let val = totalInput.value.trim();
+        if (val === "") totalInput.value = "0";
+        let num = Number(val);
+        if (isNaN(num)) totalInput.value = "0";
+        else if (num < 0) totalInput.value = "0";
+        else {
+            if (!Number.isInteger(num) && val.includes('.')) {
+                let rounded = Math.round(num * 100) / 100;
+                if (rounded !== num) totalInput.value = rounded;
+            }
+        }
+    }
+
+    // 監聽輸入欄位失去焦點矯正格式，並且如果使用者按計算時同時矯正
+    function bindInputSanitizers() {
+        paidInput.addEventListener('blur', () => {
+            sanitizePaidInput();
+            // 當手動變更時清除錯誤 (但不自動計算)
+            clearError();
+            // 為了讓顯示乾淨，可把找零顯示回之前的? 不要自動影響，因為還沒按計算找零。
+        });
+        totalInput.addEventListener('blur', () => {
+            sanitizeTotalInput();
+            clearError();
+        });
+        // 輸入過程也可以即時清除錯誤
+        paidInput.addEventListener('input', () => {
+            clearError();
+        });
+        totalInput.addEventListener('input', () => {
+            clearError();
+        });
+    }
+
+    // 另外需要在點擊計算找零時，確保雙方數值正確矯正
+    function calculateWithSanity() {
+        sanitizePaidInput();
+        sanitizeTotalInput();
+        calculateChange();
+    }
+
+    // 加碼: 為了符合題意 (按button $1000,$500... 例: 按$500二次,按100一次,按10$三次 =>付款金額顯示$1130)
+    // 測試情境: 按$500*2 + $100*1 + $10*3 = 1000+100+30=1130，我們的累加邏輯完全支持。
+    // 另外 付款金額輸入處可直接輸入 並且混合按鈕都支援。
+    // 另外額外新增一個小功能: 如果按找零之前使用者修改了付款金額欄位，再按累加會基於修改後再加，符合邏輯。
+
+    // 為了讓使用者更直覺，可以加入一個額外功能: 連續按鈕，且付款金額顯示正確，然後找零。
+    // 還有一個細節: 確保輸入框為 number 類型可能會有上下箭頭，但不影響功能。
+    // 同時防止重複初始化和事件衝突
+    function init() {
+        bindQuickButtons();
+        bindInputSanitizers();
+        calculateBtn.addEventListener('click', calculateWithSanity);
+        resetBtn.addEventListener('click', () => {
+            resetAll();
+            clearError();
+        });
+        // 預設初始顯示結果一致
+        resetAll(); // 剛載入歸零
+        // 額外增加示範: 讓總金額預設為0，付款0，計算顯示0
+        // 另外處理一下以防萬一手動輸入空白
+    }
+
+    // 執行初始化
+    init();
+
+    // 小細節修正: 由於按button可能會導致焦點離開但無妨。
+    // 優化: 若是付款金額值很大的時候，保證數字正確
+    // 另外考慮到使用者可能用快速按鈕累積超過安全整數範圍? JS最大安全整數夠大，可忽略
+    // 支援鍵盤輸入小數點計算正確
+    // 確認 result-area 找零顯示時，負數會帶負號並且顯示不足提示，完全依照公式。
+    // 測試案例: 總金額 500, 付款金額按 500 => 找零 0 顯示無需找零  ✔
+    // 總金額 320, 付款按鈕: $500一次 => 付款500 找零180 ✔
+    // 總金額1280，付款金額按 $1000 一次+ $500 兩次 => 1000+1000=2000 => 找零720 ✔
+    // 手動輸入400，按$100三次 => 400+300=700 ✔
+    // 符合要求: 最後按找零button -> 顯示找零金額
+    // 另外考慮邊界情況: 總金額 0 , 付款金額0 找零0
+    // 以及如果付款金額小於總金額，顯示負數 + 警告
+    // 所有功能完善
+</script>
+</body>
+</html>

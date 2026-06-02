@@ -1,37 +1,44 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <title>TWSE 股價查詢</title>
 </head>
 <body>
+  <h1>台股股價查詢</h1>
+  <div id="result"></div>
 
-<script>    
-  const stockCode = "2330"; // 台積電
-const url = `https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_${stockCode}.tw&json=1&delay=0`;
+  <script>
+    //https://cors-anywhere.herokuapp.com/corsdemo (cors-anywhere.herokuapp.com in Bing)
+    const stockCode = "2002"; // 台積電
+    const proxy = "https://cors-anywhere.herokuapp.com/";
+    const url = `https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_${stockCode}.tw&json=1&delay=0`;
 
-async function getTWSEStockPrice(code) {
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
+    async function getTWSEStockPrice(code) {
+      try {
+        const response = await fetch(proxy + url);
+        const data = await response.json();
 
-    if (data && data.msgArray && data.msgArray.length > 0) {
-      const stock = data.msgArray[0];
-      console.log(`股票名稱: ${stock.n}`);
-      console.log(`股票代號: ${stock.c}`);
-      console.log(`成交價: ${stock.z}`);
-    } else {
-      console.log("查無資料，可能是代號錯誤或非交易時間");
+        if (data && data.msgArray && data.msgArray.length > 0) {
+          const stock = data.msgArray[0];
+          document.getElementById("result").innerHTML = `
+            <p>股票名稱: ${stock.n}</p>
+            <p>股票代號: ${stock.c}</p>
+            <p>成交價: ${stock.z}</p>
+            <p>開盤價: ${stock.o}</p>
+            <p>最高價: ${stock.h}</p>
+            <p>最低價: ${stock.l}</p>
+            <p>成交量: ${stock.v}</p>
+          `;
+        } else {
+          document.getElementById("result").innerText = "查無資料";
+        }
+      } catch (error) {
+        document.getElementById("result").innerText = "讀取股價失敗: " + error;
+      }
     }
-  } catch (error) {
-    console.error("讀取股價失敗:", error);
-  }
-}
 
-getTWSEStockPrice(stockCode);
-
-</script>
+    getTWSEStockPrice(stockCode);
+  </script>
 </body>
-
 </html>

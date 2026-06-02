@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FinMind K線查詢</title>
+
+  <!-- TradingView Lightweight Charts -->
+  <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+
+  <style>
+    body{
+      font-family: Arial, "Microsoft JhengHei", sans-serif;
+      margin: 20px;
+      background: #f7f7f7;
+    }
+    .box{
+      background: white;
+      padding: 16px;
+      border-radius: 14px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+      max-width: 1100px;
+      margin: auto;
+    }
+    h2{ margin-top: 0; }
+
+    .row{
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    input, select{
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    button{
+      padding: 10px 16px;
+      border-radius: 10px;
+      border: none;
+      background: #111;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover{ opacity: 0.85; }
+
+    .hint{
+      color: #555;
+      margin: 8px 0 12px;
+      font-size: 14px;
+    }
+
+    .err{
+      color: #b00020;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    .charts{
+      display: grid;
+      grid-template-rows: 420px 180px;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .chart{
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #eee;
+      background: #fff;
+    }
+
+    table{
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    th, td{
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      text-align: center;
+    }
+    th{
+      background: #222;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="box">
+    <h2>📊 FinMind K線 + 均線 + 成交量</h2>
+
+    <div class="row">
+      <label>股票代碼：</label>
+      <input id="stockId" value="2330" />
+
+      <label>起始日期：</label>
+      <input id="startDate" value="2024-01-01" />
+
+      <label>顯示筆數：</label>
+      <select id="limit">
+        <option value="60">60</option>
+        <option value="120" selected>120</option>
+        <option value="0">全部</option>
+      </select>
+
+      <button onclick="getData()">查詢</button>
+    </div>
+
+    <div class="hint">
+      建議：先用 120 筆看趨勢，再切全部看長期走勢。<br/>
+      均線：MA5（短）、MA20（中）、MA60（長）
+    </div>
+
+    <div id="error" class="err"></div>
+
+    <div class="charts">
+      <div id="kline" class="chart"></div>
+      <div id="volume" class="chart"></div>
+    </div>
+
+    <table id="table">
+      <thead>
+        <tr>
+          <th>日期</th>
+          <th>開盤</th>
+          <th>最高</th>
+          <th>最低</th>
+          <th>收盤</th>
+          <th>成交量</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+<script>
+let klineChart = null;
+let volChart = null;
+
+let candleSeries = null;
+let ma5Series = null;
+let ma20Series = null;
+let ma60Series = null;
+
+let volumeSeries = null;
+
+function calcMA(rows, period) {
+  const out = [];
+  let sum = 0;
+
+  for (let i = 0; i < rows.length; i++) {
+    sum += rows[i].close;
+
+    if (i >= period) {
+      sum -= rows[i - period].close;
+    }
+
+    // 不足期數：不輸出資料（不要 value:null）
+    if (i >= period - 1) {
+      out.push({
+        time: rows[i].date,
+        value: +(sum / period).toFixed(2),
+      });
+    }
+  }
+  return out;
+}
+
+function destroyCharts() {
+  if (klineChart) {
+    klineChart.remove();
+    klineChart = null;
+  }
+  if (volChart) {
+    volChart.remove();
+    volChart = null;
+  }
+}
+
+function createCharts() {
+  const klineDiv = document.getElementById("kline");
+  const volDiv = document.getElementById("volume");
+
+  klineChart = LightweightCharts.createChart(klineDiv, {
+    layout: {
+      background: { type: "solid", color: "#ffffff" },
+      textColor: "#111"
+    },
+    grid: {
+      vertLines: { color: "#f0f0f0" },
+      horzLines: { color: "#f0f0f0" }
+    },
+    rightPriceScale: { borderColor: "#e5e5e5" },
+    timeScale: { borderColor: "#e5e5e5" },
+    crosshair: { mode: 1 },
+  });
+
+  volChart = LightweightCharts.createChart(volDiv, {
+    layout: {
+      background: { type: "solid", color: "#ffffff" },
+      textColor: "#111"
+    },
+    grid: {
+      vertLines: { color: "#f0f0f0" },
+      horzLines: { color: "#f0f0f0" }
+    },
+    rightPriceScale: { borderColor: "#e5e5e5" },
+    timeScale: { borderColor: "#e5e5e5" },
+    crosshair: { mode: 1 },
+  });
+
+  // ✅ v5 Candlestick
+  candleSeries = klineChart.addSeries(
+    LightweightCharts.CandlestickSeries,
+    {}
+  );
+
+  // ✅ v5 Line
+  ma5Series = klineChart.addSeries(LightweightCharts.LineSeries, { lineWidth: 2 });
+  ma20Series = klineChart.addSeries(LightweightCharts.LineSeries, { lineWidth: 2 });
+  ma60Series = klineChart.addSeries(LightweightCharts.LineSeries, { lineWidth: 2 });
+
+  // ✅ v5 Histogram
+  volumeSeries = volChart.addSeries(LightweightCharts.HistogramSeries, {
+    priceFormat: { type: "volume" },
+    priceScaleId: ""
+  });
+
+  volChart.priceScale("").applyOptions({
+    scaleMargins: { top: 0.1, bottom: 0 }
+  });
+
+  // ✅ 只同步 crosshair，不同步 visible range（避免 null range）
+    klineChart.subscribeCrosshairMove((param) => {
+    if (!param || !param.time) return;
+    volChart.setCrosshairPosition(param.point?.x ?? 0, param.point?.y ?? 0, volumeSeries);
+    });
+
+    volChart.subscribeCrosshairMove((param) => {
+    if (!param || !param.time) return;
+    klineChart.setCrosshairPosition(param.point?.x ?? 0, param.point?.y ?? 0, candleSeries);
+    });
+}
+
+
+async function getData() {
+  document.getElementById("error").innerText = "";
+
+  const stockId = document.getElementById("stockId").value.trim();
+  const startDate = document.getElementById("startDate").value.trim();
+  const limit = parseInt(document.getElementById("limit").value, 10);
+
+  try {
+    const url = `http://localhost:3000/api/stock?stock_id=${encodeURIComponent(stockId)}&start_date=${encodeURIComponent(startDate)}`;
+    const response = await fetch(url);
+    const json = await response.json();
+
+    if (!json || json.msg !== "success") {
+      document.getElementById("error").innerText =
+        "❌ API 回傳失敗：" + JSON.stringify(json);
+      return;
+    }
+
+    let rows = json.data || [];
+    if (rows.length === 0) {
+      document.getElementById("error").innerText =
+        "⚠️ 沒有資料（日期太新/太舊或代碼錯）";
+      return;
+    }
+
+    // 依 limit 截取
+    if (limit > 0 && rows.length > limit) {
+      rows = rows.slice(rows.length - limit);
+    }
+
+    // ===== 轉換成 K線格式 =====
+    const candles = rows.map(r => ({
+      time: r.date,
+      open: r.open,
+      high: r.max,
+      low: r.min,
+      close: r.close
+    }));
+
+    // ===== 成交量格式 =====
+    // Lightweight-charts 的 histogram 可以給 color
+    // 這裡用收盤漲跌決定顏色（紅漲綠跌）
+    const volumes = rows.map(r => ({
+      time: r.date,
+      value: r.Trading_Volume,
+      color: (r.close >= r.open) ? "rgba(220, 0, 0, 0.45)" : "rgba(0, 160, 0, 0.45)"
+    }));
+
+    // ===== 均線 =====
+    const ma5 = calcMA(rows, 5);
+    const ma20 = calcMA(rows, 20);
+    const ma60 = calcMA(rows, 60);
+
+    // ===== 重新建立圖表 =====
+    destroyCharts();
+    createCharts();
+
+    candleSeries.setData(candles);
+    volumeSeries.setData(volumes);   
+
+    ma5Series.setData(ma5);
+    ma20Series.setData(ma20);
+    ma60Series.setData(ma60);
+
+    klineChart.timeScale().fitContent();
+    volChart.timeScale().fitContent();
+
+    // ===== 表格（顯示最後 30 筆）=====
+    const tbody = document.querySelector("#table tbody");
+    tbody.innerHTML = "";
+
+    const showRows = rows.slice(-30).reverse();
+    for (const r of showRows) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${r.date}</td>
+        <td>${r.open}</td>
+        <td>${r.max}</td>
+        <td>${r.min}</td>
+        <td><b>${r.close}</b></td>
+        <td>${r.Trading_Volume}</td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+  } catch (err) {
+    console.error(err);
+    document.getElementById("error").innerText =
+      "❌ fetch 失敗：請確認 Node server 有啟動 (http://localhost:3000)";
+  }
+}
+
+// 預設載入一次
+getData();
+</script>
+
+</body>
+</html>
