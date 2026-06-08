@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>永勝關東煮 · 點餐找零系統</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Helvetica Neue', sans-serif;
+        }
+        body {
+            background: #fef7e6;
+            margin: 0;
+            padding: 16px 12px 40px;
+        }
+        .app-container {
+            max-width: 650px;
+            margin: 0 auto;
+        }
+        /* 餐廳標題 */
+        .shop-header {
+            background: #d9480f;
+            color: white;
+            padding: 16px 18px;
+            border-radius: 32px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+        .shop-header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+        }
+        .shop-header p {
+            margin: 6px 0 0;
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+        /* 雙欄菜單 (關東煮/飯麵湯類) 使用grid */
+        .menu-panel {
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            padding: 12px 12px 20px;
+            margin-bottom: 24px;
+        }
+        .section-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            border-left: 7px solid #f97316;
+            padding-left: 14px;
+            margin: 12px 0 12px 0;
+            color: #2d2a24;
+        }
+        .menu-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .menu-category {
+            background: #fff6ed;
+            border-radius: 28px;
+            padding: 10px 12px;
+        }
+        .cat-name {
+            font-weight: 700;
+            font-size: 1rem;
+            color: #b45309;
+            border-bottom: 2px dashed #ffd8b5;
+            padding-bottom: 4px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .menu-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .menu-item-card {
+            background: white;
+            border-radius: 48px;
+            padding: 5px 12px 5px 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            border: 1px solid #ffe0c0;
+        }
+        .item-name {
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        .item-price {
+            color: #d97706;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+        .item-control {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #f2f2f2;
+            border-radius: 32px;
+            padding: 2px 8px;
+        }
+        .item-control button {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            font-weight: bold;
+            width: 26px;
+            cursor: pointer;
+            color: #f97316;
+        }
+        .item-count {
+            min-width: 24px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        /* 編輯模式 */
+        .edit-badge {
+            background: #fee2e2;
+            border-radius: 20px;
+            padding: 12px;
+            margin: 10px 0 5px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .btn-edit {
+            background: #f97316;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 8px 16px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        .btn-edit-outline {
+            background: white;
+            border: 1px solid #f97316;
+            color: #f97316;
+            border-radius: 40px;
+            padding: 6px 14px;
+            font-weight: bold;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+        /* 點餐清單 */
+        .order-summary {
+            background: #2e241f;
+            color: #fef3c7;
+            border-radius: 36px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+        .order-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #facc15;
+            padding-bottom: 6px;
+            margin-bottom: 12px;
+        }
+        .order-list {
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 0.85rem;
+            margin-bottom: 12px;
+        }
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 6px 0;
+        }
+        .total-row {
+            font-weight: 800;
+            font-size: 1.3rem;
+            text-align: right;
+            border-top: 1px solid #facc15;
+            padding-top: 8px;
+            margin-top: 6px;
+        }
+        /* 付款找零區 */
+        .payment-area {
+            background: white;
+            border-radius: 32px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .pay-input-group {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .pay-input-group label {
+            font-weight: 700;
+        }
+        .pay-input {
+            flex: 2;
+            padding: 12px;
+            font-size: 1.2rem;
+            border-radius: 60px;
+            border: 1px solid #fbc48a;
+            text-align: right;
+            font-weight: bold;
+        }
+        .btn-calc {
+            background: #f97316;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 60px;
+            font-weight: bold;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .change-result {
+            background: #eef2ff;
+            border-radius: 48px;
+            padding: 12px 20px;
+            text-align: center;
+        }
+        .change-label {
+            font-size: 0.8rem;
+            color: #374151;
+        }
+        .change-money {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #d97706;
+        }
+        .error-msg {
+            color: #dc2626;
+            font-size: 0.7rem;
+        }
+        button:active { transform: scale(0.96); }
+        footer {
+            text-align: center;
+            font-size: 0.6rem;
+            margin-top: 20px;
+            color: #a16234;
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="shop-header">
+        <h1>🍢 永勝關東煮</h1>
+        <p>台南市永康區永勝街119號 | 預訂 0909-013660</p>
+    </div>
+
+    <!-- 菜單面板 (動態生成) -->
+    <div class="menu-panel" id="menuPanel">
+        <div class="section-title">📋 今日菜單 (可編輯價格/名稱)</div>
+        <div id="dynamicMenu"></div>
+        <div class="edit-badge">
+            <span style="font-size:0.75rem;">✏️ 點擊「編輯模式」可更改菜名/單價，修改後自動儲存至手機</span>
+            <button id="toggleEditBtn" class="btn-edit">✏️ 編輯模式 OFF</button>
+        </div>
+    </div>
+
+    <!-- 點餐清單 + 總金額 -->
+    <div class="order-summary">
+        <div class="order-title">
+            <span>🧾 目前點餐</span>
+            <button id="clearOrderBtn" style="background:#6c4c3a; border:none; color:white; border-radius:40px; padding:4px 12px;">清空</button>
+        </div>
+        <div id="orderList" class="order-list">尚未點餐</div>
+        <div class="total-row">總金額 NT$ <span id="totalAmountSpan">0</span></div>
+    </div>
+
+    <!-- 付款找零區 -->
+    <div class="payment-area">
+        <div class="pay-input-group">
+            <label>💵 客人付款：</label>
+            <input type="number" id="paidInput" class="pay-input" placeholder="輸入金額" value="0" step="1">
+            <button id="calcChangeBtn" class="btn-calc">🧾 找零</button>
+        </div>
+        <div class="change-result">
+            <div class="change-label">找零金額</div>
+            <div class="change-money" id="changeDisplay">0</div>
+            <div id="payErrorMsg" class="error-msg"></div>
+        </div>
+    </div>
+    <footer>✓ 點擊 + / - 增減數量　✓ 編輯模式可長按修改價格/名稱，自動儲存至手機</footer>
+</div>
+
+<script>
+    // ---------- 1. 初始菜單資料 (依據圖片完整建立) ----------
+    const defaultMenu = {
+        "關東煮類": [
+            { id: "bd1", name: "黑輪", price: 10, unit: "支" },
+            { id: "bd2", name: "米血", price: 10, unit: "支" },
+            { id: "bd3", name: "魚板", price: 10, unit: "支" },
+            { id: "bd4", name: "豬皮", price: 10, unit: "片" },
+            { id: "bd5", name: "菜頭", price: 10, unit: "個" },
+            { id: "bd6", name: "貢丸", price: 10, unit: "顆" },
+            { id: "bd7", name: "魚豆腐(2個)", price: 15, unit: "份" },
+            { id: "bd8", name: "北海貝(2個)", price: 15, unit: "份" },
+            { id: "bd9", name: "龍棒", price: 15, unit: "支" },
+            { id: "bd10", name: "苦瓜封", price: 0, unit: "時價" } // 時價暫設0，編輯可改
+        ],
+        "飯類/主食": [
+            { id: "rice1", name: "肉燥飯", price: 25, unit: "碗" },
+            { id: "rice2", name: "鍋燒意麵(葷)", price: 70, unit: "碗" },
+            { id: "rice3", name: "鍋燒意麵(素)", price: 70, unit: "碗" },
+            { id: "rice4", name: "原味鍋燒冬粉", price: 70, unit: "碗" },
+            { id: "rice5", name: "沙茶鍋燒", price: 70, unit: "碗" },
+            { id: "rice6", name: "泡菜鍋燒", price: 90, unit: "碗" },
+            { id: "rice7", name: "海鮮鍋燒", price: 100, unit: "碗" },
+            { id: "rice8", name: "心情炒飯", price: 70, unit: "份" },
+            { id: "rice9", name: "鰻仁蛋炒飯", price: 70, unit: "份" },
+            { id: "rice10", name: "肉絲蛋炒飯", price: 70, unit: "份" },
+            { id: "rice11", name: "香腸蛋炒飯", price: 70, unit: "份" },
+            { id: "rice12", name: "火腿蛋炒飯", price: 70, unit: "份" },
+            { id: "rice13", name: "泡菜炒飯", price: 85, unit: "份" },
+            { id: "rice14", name: "白飯", price: 10, unit: "碗" }
+        ],
+        "湯類": [
+            { id: "soup1", name: "蛋花湯", price: 20, unit: "碗" },
+            { id: "soup2", name: "菜頭湯", price: 30, unit: "碗" },
+            { id: "soup3", name: "貢丸湯", price: 30, unit: "碗" },
+            { id: "soup4", name: "蛤湯", price: 40, unit: "碗" },
+            { id: "soup5", name: "肝連湯", price: 50, unit: "碗" },
+            { id: "soup6", name: "苦瓜封湯", price: 0, unit: "時價" }
+        ],
+        "煎類/小菜": [
+            { id: "side1", name: "大腸", price: 40, unit: "條" },
+            { id: "side2", name: "香腸", price: 35, unit: "條" },
+            { id: "side3", name: "荷包蛋", price: 15, unit: "份" },
+            { id: "side4", name: "蔥花蛋", price: 30, unit: "份" },
+            { id: "side5", name: "菜脯蛋", price: 30, unit: "份" },
+            { id: "side6", name: "油豆腐", price: 10, unit: "個" },
+            { id: "side7", name: "青菜(燙/炒)", price: 35, unit: "份" },
+            { id: "side8", name: "涼拌小黃瓜", price: 30, unit: "份" },
+            { id: "side9", name: "泰式涼拌青木瓜絲", price: 35, unit: "份" },
+            { id: "side10", name: "黑白切(肝連)", price: 0, unit: "時價" },
+            { id: "side11", name: "黑白切(小腸)", price: 0, unit: "時價" }
+        ]
+    };
+
+    // 合併所有品項 (儲存結構化菜單)
+    let menuData = {}; // { categoryName: [items] }
+    // 購物車 { itemId: { id, name, price, count, category, unit } }
+    let cart = {};
+
+    // 編輯模式開關
+    let editMode = false;
+
+    // ----- 載入 / 儲存 localStorage -----
+    function loadMenuFromStorage() {
+        const stored = localStorage.getItem("yongsheng_menu");
+        if(stored) {
+            try {
+                const parsed = JSON.parse(stored);
+                menuData = parsed;
+                return true;
+            } catch(e) { console.warn(e); }
+        }
+        // 初次複製預設
+        menuData = JSON.parse(JSON.stringify(defaultMenu));
+        return false;
+    }
+
+    function saveMenuToStorage() {
+        localStorage.setItem("yongsheng_menu", JSON.stringify(menuData));
+    }
+
+    function loadCartFromStorage() {
+        const savedCart = localStorage.getItem("yongsheng_cart");
+        if(savedCart) {
+            try {
+                const parsedCart = JSON.parse(savedCart);
+                cart = parsedCart;
+            } catch(e) { cart = {}; }
+        } else {
+            cart = {};
+        }
+    }
+
+    function saveCartToStorage() {
+        localStorage.setItem("yongsheng_cart", JSON.stringify(cart));
+    }
+
+    // ----- 工具函數 -----
+    function updateTotal() {
+        let total = 0;
+        for(let id in cart) {
+            const item = cart[id];
+            const price = Number(item.price);
+            const qty = Number(item.count);
+            total += price * qty;
+        }
+        document.getElementById("totalAmountSpan").innerText = total.toFixed(0);
+        return total;
+    }
+
+    function renderOrderList() {
+        const container = document.getElementById("orderList");
+        if(Object.keys(cart).length === 0) {
+            container.innerHTML = "<div style='opacity:0.7;'>📭 暫無餐點，點選上方＋號</div>";
+        } else {
+            let html = "";
+            for(let id in cart) {
+                const it = cart[id];
+                html += `<div class="order-item">
+                            <span>${it.name} x ${it.count}</span>
+                            <span>NT$ ${(it.price * it.count).toFixed(0)}</span>
+                         </div>`;
+            }
+            container.innerHTML = html;
+        }
+        updateTotal();
+        saveCartToStorage();
+    }
+
+    // 增加/減少數量
+    function addItem(item, categoryName) {
+        const id = item.id;
+        const currentPrice = item.price;
+        if(cart[id]) {
+            cart[id].count += 1;
+        } else {
+            cart[id] = {
+                id: id,
+                name: item.name,
+                price: currentPrice,
+                count: 1,
+                category: categoryName,
+                unit: item.unit || ""
+            };
+        }
+        renderOrderList();
+    }
+
+    function removeItem(itemId) {
+        if(cart[itemId]) {
+            if(cart[itemId].count > 1) {
+                cart[itemId].count -= 1;
+            } else {
+                delete cart[itemId];
+            }
+        }
+        renderOrderList();
+    }
+
+    // 動態產生完整菜單 (可編輯)
+    function renderMenu() {
+        const menuContainer = document.getElementById("dynamicMenu");
+        if(!menuContainer) return;
+        let html = `<div class="menu-grid">`;
+        for(let [catName, items] of Object.entries(menuData)) {
+            html += `<div class="menu-category">
+                        <div class="cat-name">🍢 ${catName}</div>
+                        <div class="menu-items">`;
+            items.forEach(item => {
+                const displayPrice = (item.price === 0 && item.unit === "時價") ? "時價" : `$${item.price}`;
+                html += `<div class="menu-item-card" data-id="${item.id}" data-cat="${catName}">
+                            <span class="item-name">${item.name}</span>
+                            <span class="item-price">${displayPrice}</span>`;
+                if(editMode) {
+                    // 編輯模式：可改名稱/價格
+                    html += `<div style="display:flex; gap:4px; margin-left:4px;">
+                                <input type="text" class="edit-name-input" value="${escapeHtml(item.name)}" style="width:70px; font-size:0.7rem; border-radius:20px; border:1px solid #f97316; padding:2px 6px;">
+                                <input type="number" class="edit-price-input" value="${item.price}" step="1" style="width:60px; font-size:0.7rem; border-radius:20px; border:1px solid #f97316; padding:2px 6px;">
+                                <button class="save-item-edit" style="background:#f97316; border:none; border-radius:20px; color:white; padding:2px 8px;">✔️</button>
+                             </div>`;
+                } else {
+                    // 一般模式: 加減按鈕
+                    const cartItem = cart[item.id];
+                    const qty = cartItem ? cartItem.count : 0;
+                    html += `<div class="item-control">
+                                <button class="minus-btn" data-id="${item.id}">−</button>
+                                <span class="item-count">${qty}</span>
+                                <button class="plus-btn" data-id="${item.id}">+</button>
+                             </div>`;
+                }
+                html += `</div>`;
+            });
+            html += `</div></div>`;
+        }
+        html += `</div>`;
+        menuContainer.innerHTML = html;
+
+        // 綁定一般模式下 + / - 事件
+        if(!editMode) {
+            document.querySelectorAll('.plus-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = btn.getAttribute('data-id');
+                    for(let [cat, items] of Object.entries(menuData)) {
+                        const found = items.find(i => i.id === id);
+                        if(found) {
+                            addItem(found, cat);
+                            break;
+                        }
+                    }
+                    renderMenu();   // 重新刷新按鈕數量顯示
+                    renderOrderList();
+                });
+            });
+            document.querySelectorAll('.minus-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = btn.getAttribute('data-id');
+                    removeItem(id);
+                    renderMenu();
+                    renderOrderList();
+                });
+            });
+        } else {
+            // 編輯模式下，儲存修改按鈕
+            document.querySelectorAll('.save-item-edit').forEach((btn, idx) => {
+                const parentCard = btn.closest('.menu-item-card');
+                if(parentCard) {
+                    const id = parentCard.getAttribute('data-id');
+                    const catName = parentCard.getAttribute('data-cat');
+                    const nameInput = parentCard.querySelector('.edit-name-input');
+                    const priceInput = parentCard.querySelector('.edit-price-input');
+                    btn.addEventListener('click', () => {
+                        let newName = nameInput.value.trim();
+                        let newPrice = parseFloat(priceInput.value);
+                        if(newName === "") newName = "菜品";
+                        if(isNaN(newPrice)) newPrice = 0;
+                        // 更新 menuData
+                        const categoryArray = menuData[catName];
+                        if(categoryArray) {
+                            const targetItem = categoryArray.find(i => i.id === id);
+                            if(targetItem) {
+                                targetItem.name = newName;
+                                targetItem.price = newPrice;
+                                // 同步購物車中已點的品項名稱與價格 (避免顯示舊資料)
+                                if(cart[id]) {
+                                    cart[id].name = newName;
+                                    cart[id].price = newPrice;
+                                }
+                                saveMenuToStorage();
+                                renderMenu();      // 重新刷新編輯模式介面
+                                renderOrderList(); // 更新總金額
+                            }
+                        }
+                    });
+                }
+            });
+        }
+    }
+
+    function escapeHtml(str) {
+        return str.replace(/[&<>]/g, function(m) {
+            if(m === '&') return '&amp;';
+            if(m === '<') return '&lt;';
+            if(m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    // 清空購物車
+    function clearCart() {
+        cart = {};
+        renderOrderList();
+        renderMenu();   // 刷新選單數量顯示歸零
+        // 同時清空找零顯示
+        document.getElementById("changeDisplay").innerText = "0";
+        document.getElementById("payErrorMsg").innerText = "";
+    }
+
+    // 付款找零邏輯
+    function calculateChange() {
+        const total = updateTotal();
+        let paidInput = document.getElementById("paidInput");
+        let paidVal = parseFloat(paidInput.value);
+        if(isNaN(paidVal)) paidVal = 0;
+        const change = paidVal - total;
+        const changeSpan = document.getElementById("changeDisplay");
+        const errorMsg = document.getElementById("payErrorMsg");
+        if(change < 0) {
+            changeSpan.innerText = `${Math.abs(change).toFixed(0)}`;
+            errorMsg.innerText = `⚠️ 付款不足，尚欠 ${Math.abs(change).toFixed(0)} 元`;
+        } else {
+            changeSpan.innerText = change.toFixed(0);
+            errorMsg.innerText = change === 0 ? "✔️ 金額剛好" : "";
+        }
+    }
+
+    // 初始化事件與儲存
+    function init() {
+        loadMenuFromStorage();
+        loadCartFromStorage();
+        // 確保苦瓜封時價等預設不為NaN（若有存檔則沿用）
+        renderMenu();
+        renderOrderList();
+        // 綁定清空按鈕
+        document.getElementById("clearOrderBtn").addEventListener("click", () => {
+            clearCart();
+        });
+        // 找零按鈕
+        document.getElementById("calcChangeBtn").addEventListener("click", calculateChange);
+        // 編輯模式切換
+        const toggleBtn = document.getElementById("toggleEditBtn");
+        toggleBtn.addEventListener("click", () => {
+            editMode = !editMode;
+            toggleBtn.innerText = editMode ? "✏️ 編輯模式 ON" : "✏️ 編輯模式 OFF";
+            renderMenu();  // 重新渲染菜單(編輯/一般切換)
+        });
+        // 儲存時價格修改後自動存菜單 (已於儲存時呼叫saveMenuToStorage)
+        window.addEventListener("beforeunload", () => {
+            saveMenuToStorage();
+            saveCartToStorage();
+        });
+        // 手動變動付款金額時清空舊錯誤
+        document.getElementById("paidInput").addEventListener("input", () => {
+            document.getElementById("payErrorMsg").innerText = "";
+        });
+    }
+
+    init();
+</script>
+</body>
+</html>
