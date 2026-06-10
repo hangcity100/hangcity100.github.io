@@ -363,6 +363,10 @@
     <div class="menu-panel" id="menuPanel">
         <div class="section-title">📋 今日菜單 (可編輯價格/名稱)</div>
         <div id="dynamicMenu"></div>
+        <div id="categoryEditor" style="display:none; gap:8px; align-items:center; margin:10px 0 8px;">
+            <input id="newCategoryName" type="text" placeholder="輸入新類別名稱" style="flex:1; padding:8px 12px; border-radius:20px; border:1px solid #f3c7a0;">
+            <button id="addCategoryBtn" class="btn-edit-outline">新增類別</button>
+        </div>
         <div class="edit-badge">
             <span style="font-size:0.75rem;">✏️ 點擊「編輯模式」可更改菜名/單價，修改後自動儲存至手機</span>
             <button id="toggleEditBtn" class="btn-edit">✏️ 編輯模式 OFF</button>
@@ -645,19 +649,32 @@
         if(!menuContainer) return;
         let html = `<div class="menu-grid">`;
         for(let [catName, items] of Object.entries(menuData)) {
-            html += `<div class="menu-category">
-                        <div class="cat-name">🍢 ${catName}</div>
-                        <div class="menu-items">`;
+            if(editMode) {
+                html += `<div class="menu-category">
+                            <div class="cat-name"><span>🍢 ${escapeHtml(catName)}</span>
+                                <span style="display:flex; gap:8px;">
+                                    <button class="add-item-btn" data-cat="${catName}" style="background:#fff; border:1px solid #f97316; color:#f97316; border-radius:20px; padding:4px 8px;">＋ 新增項目</button>
+                                    <button class="delete-cat-btn" data-cat="${catName}" style="background:#ffecec; border:1px solid #f97316; color:#b91c1c; border-radius:20px; padding:4px 8px;">刪除類別</button>
+                                </span>
+                            </div>
+                            <div class="menu-items">`;
+            } else {
+                html += `<div class="menu-category">
+                            <div class="cat-name">🍢 ${escapeHtml(catName)}</div>
+                            <div class="menu-items">`;
+            }
             items.forEach(item => {
                 const displayPrice = (item.price === 0 && item.unit === "時價") ? "時價" : `$${item.price}`;
-                html += `<div class="menu-item-card" data-id="${item.id}" data-cat="${catName}">
+                html += `<div class="menu-item-card" data-id="${item.id}" data-cat="${escapeHtml(catName)}">
                             <span class="item-name">${escapeHtml(item.name)}</span>
                             <span class="item-price">${displayPrice}</span>`;
                 if(editMode) {
-                    html += `<div style="display:flex; gap:4px; margin-left:4px;">
-                                <input type="text" class="edit-name-input" value="${escapeHtml(item.name)}" style="width:70px; font-size:0.7rem; border-radius:20px; border:1px solid #f97316; padding:2px 6px;">
-                                <input type="number" class="edit-price-input" value="${item.price}" step="1" style="width:60px; font-size:0.7rem; border-radius:20px; border:1px solid #f97316; padding:2px 6px;">
-                                <button class="save-item-edit" style="background:#f97316; border:none; border-radius:20px; color:white; padding:2px 8px;">✔️</button>
+                    html += `<div style="display:flex; gap:6px; margin-left:4px; align-items:center;">
+                                <input type="text" class="edit-name-input" value="${escapeHtml(item.name)}" style="width:90px; font-size:0.7rem; border-radius:20px; border:1px solid #f97316; padding:2px 6px;">
+                                <input type="number" class="edit-price-input" value="${item.price}" step="1" style="width:70px; font-size:0.7rem; border-radius:20px; border:1px solid #f97316; padding:2px 6px;">
+                                <button class="save-item-edit" style="background:#f97316; border:none; border-radius:20px; color:white; padding:4px 8px;">✔️</button>
+                                <button class="add-child-btn" data-id="${item.id}" data-cat="${catName}" style="background:#fff; border:1px solid #f97316; color:#f97316; border-radius:20px; padding:4px 8px;">＋ 子項</button>
+                                <button class="delete-item-btn" data-id="${item.id}" data-cat="${catName}" style="background:#ffecec; border:1px solid #f97316; color:#b91c1c; border-radius:20px; padding:4px 8px;">刪除</button>
                              </div>`;
                 } else {
                     const cartItem = cart[item.id];
@@ -668,6 +685,35 @@
                                 <button class="plus-btn" data-id="${item.id}">+</button>
                              </div>`;
                 }
+
+                // 處理子項（如果有）
+                if(item.children && Array.isArray(item.children) && item.children.length > 0) {
+                    html += `<div style="margin-left:18px; margin-top:8px; display:flex; flex-wrap:wrap; gap:8px;">`;
+                        item.children.forEach(child => {
+                        const cPrice = (child.price === 0 && child.unit === "時價") ? "時價" : `$${child.price}`;
+                        html += `<div class="menu-item-card" data-id="${child.id}" data-cat="${catName}">
+                                    <span class="item-name">↳ ${escapeHtml(child.name)}</span>
+                                    <span class="item-price">${cPrice}</span>`;
+                        if(editMode) {
+                            html += `<div style="display:flex; gap:6px; margin-left:4px; align-items:center;">
+                                        <input type="text" class="edit-name-input" value="${escapeHtml(child.name)}" style="width:80px; font-size:0.7rem; border-radius:20px; border:1px solid #f97316; padding:2px 6px;">
+                                        <input type="number" class="edit-price-input" value="${child.price}" step="1" style="width:60px; font-size:0.7rem; border-radius:20px; border:1px solid #f97316; padding:2px 6px;">
+                                        <button class="save-item-edit" style="background:#f97316; border:none; border-radius:20px; color:white; padding:4px 8px;">✔️</button>
+                                        <button class="delete-item-btn" data-id="${child.id}" data-cat="${catName}" style="background:#ffecec; border:1px solid #f97316; color:#b91c1c; border-radius:20px; padding:4px 8px;">刪除</button>
+                                     </div>`;
+                        } else {
+                            const cQty = cart[child.id] ? cart[child.id].count : 0;
+                            html += `<div class="item-control">
+                                        <button class="minus-btn" data-id="${child.id}">−</button>
+                                        <span class="item-count">${cQty}</span>
+                                        <button class="plus-btn" data-id="${child.id}">+</button>
+                                     </div>`;
+                        }
+                        html += `</div>`;
+                    });
+                    html += `</div>`;
+                }
+
                 html += `</div>`;
             });
             html += `</div></div>`;
@@ -728,6 +774,86 @@
                 }
             });
         }
+
+        // 編輯模式下：新增/刪除類別、項目、子項事件
+        if(editMode) {
+            document.querySelectorAll('.add-item-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const cat = btn.getAttribute('data-cat');
+                    const name = prompt('輸入新項目名稱', '新菜品');
+                    if(!name) return;
+                    const priceStr = prompt('輸入價格（數字）', '0');
+                    let price = parseFloat(priceStr);
+                    if(isNaN(price)) price = 0;
+                    const newId = genId('it');
+                    menuData[cat].push({ id: newId, name: name, price: price, unit: '' });
+                    saveMenuToStorage();
+                    renderMenu();
+                });
+            });
+
+            document.querySelectorAll('.add-child-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const cat = btn.getAttribute('data-cat');
+                    const parentId = btn.getAttribute('data-id');
+                    const name = prompt('輸入子項名稱', '子項');
+                    if(!name) return;
+                    const priceStr = prompt('輸入價格（數字）', '0');
+                    let price = parseFloat(priceStr);
+                    if(isNaN(price)) price = 0;
+                    const newId = genId('it');
+                    const catArray = menuData[cat];
+                    const parent = catArray.find(i => i.id === parentId);
+                    if(parent) {
+                        parent.children = parent.children || [];
+                        parent.children.push({ id: newId, name: name, price: price, unit: '' });
+                        saveMenuToStorage();
+                        renderMenu();
+                    }
+                });
+            });
+
+            document.querySelectorAll('.delete-item-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-id');
+                    const cat = btn.getAttribute('data-cat');
+                    if(!confirm('確定要刪除此項目？')) return;
+                    const catArray = menuData[cat];
+                    if(catArray) {
+                        // 先嘗試在主層刪除
+                        const idx = catArray.findIndex(i => i.id === id);
+                        if(idx !== -1) {
+                            catArray.splice(idx,1);
+                            saveMenuToStorage();
+                            renderMenu();
+                            return;
+                        }
+                        // 再嘗試在子項中刪除
+                        for(const it of catArray) {
+                            if(it.children && Array.isArray(it.children)) {
+                                const cIdx = it.children.findIndex(c => c.id === id);
+                                if(cIdx !== -1) {
+                                    it.children.splice(cIdx,1);
+                                    saveMenuToStorage();
+                                    renderMenu();
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+
+            document.querySelectorAll('.delete-cat-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const cat = btn.getAttribute('data-cat');
+                    if(!confirm('確定要刪除整個類別與其所有項目？')) return;
+                    delete menuData[cat];
+                    saveMenuToStorage();
+                    renderMenu();
+                });
+            });
+        }
     }
 
     function escapeHtml(str) {
@@ -737,6 +863,12 @@
             if(m === '>') return '&gt;';
             return m;
         });
+    }
+
+    // 產生簡單唯一 ID
+    function genId(prefix) {
+        prefix = prefix || 'id';
+        return prefix + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2,8);
     }
 
     // 初始化與事件
@@ -759,6 +891,25 @@
         toggleBtn.addEventListener("click", () => {
             editMode = !editMode;
             toggleBtn.innerText = editMode ? "✏️ 編輯模式 ON" : "✏️ 編輯模式 OFF";
+            document.getElementById('categoryEditor').style.display = editMode ? 'flex' : 'none';
+            renderMenu();
+        });
+
+        // 新增類別
+        document.getElementById('addCategoryBtn').addEventListener('click', () => {
+            const nameInput = document.getElementById('newCategoryName');
+            let newName = nameInput.value.trim();
+            if(!newName) {
+                alert('請輸入類別名稱');
+                return;
+            }
+            if(menuData[newName]) {
+                alert('類別已存在');
+                return;
+            }
+            menuData[newName] = [];
+            saveMenuToStorage();
+            nameInput.value = '';
             renderMenu();
         });
         
