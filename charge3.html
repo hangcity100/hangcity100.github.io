@@ -350,6 +350,32 @@
             .change-money { font-size: 2.8rem; }
             .btn-pay-big { font-size: 1.3rem; padding: 14px 20px; }
         }
+        /* 編輯模式：單頁編輯 (手機/平板友善) */
+        body.editing-mode .order-summary,
+        body.editing-mode .payment-area,
+        body.editing-mode footer {
+            display: none;
+        }
+        body.editing-mode .menu-panel {
+            position: fixed;
+            top: 112px; /* 約略留出 header 空間 */
+            left: 12px;
+            right: 12px;
+            bottom: 12px;
+            z-index: 1200;
+            overflow: auto;
+            padding: 10px;
+        }
+        body.editing-mode .menu-category { margin-bottom:8px; }
+        body.editing-mode .menu-items { gap:8px; }
+        body.editing-mode .menu-item-card { padding:6px 8px; border-radius:12px; font-size:0.85rem; }
+        body.editing-mode .menu-item-card .item-name { font-size:0.82rem; }
+        body.editing-mode .menu-item-card .item-price { font-size:0.78rem; }
+        body.editing-mode .edit-name-input, body.editing-mode .edit-price-input { width:72px; padding:6px 8px; font-size:0.85rem; }
+        body.editing-mode .add-item-btn, body.editing-mode .delete-cat-btn, body.editing-mode .add-child-btn, body.editing-mode .delete-item-btn { padding:6px 8px; font-size:0.78rem; }
+        @media (min-width: 481px) and (max-width: 900px) {
+            body.editing-mode .menu-panel { top: 140px; }
+        }
     </style>
 </head>
 <body>
@@ -892,6 +918,7 @@
             editMode = !editMode;
             toggleBtn.innerText = editMode ? "✏️ 編輯模式 ON" : "✏️ 編輯模式 OFF";
             document.getElementById('categoryEditor').style.display = editMode ? 'flex' : 'none';
+            document.body.classList.toggle('editing-mode', editMode);
             renderMenu();
         });
 
