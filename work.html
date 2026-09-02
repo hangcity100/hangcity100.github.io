@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>謝珺潔 2026年9月班表</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #f5f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            padding: 8px;
+            margin: 0;
+        }
+        .container {
+            max-width: 480px;
+            width: 100%;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+            padding: 18px 14px 24px;
+            transition: all 0.2s;
+        }
+        h1 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            text-align: center;
+            margin: 0 0 4px 0;
+            letter-spacing: 1px;
+            color: #1e293b;
+        }
+        .subhead {
+            text-align: center;
+            font-size: 0.95rem;
+            color: #475569;
+            margin-bottom: 18px;
+            border-bottom: 2px dashed #e2e8f0;
+            padding-bottom: 12px;
+        }
+        .subhead span {
+            background: #eef2ff;
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-weight: 500;
+            color: #1e4a7a;
+        }
+        /* 月曆標頭 */
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #334155;
+            background: #f1f5f9;
+            border-radius: 20px;
+            padding: 8px 0;
+            margin-bottom: 8px;
+        }
+        /* 網格月曆 */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        .day-cell {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 6px 2px 4px;
+            text-align: center;
+            min-height: 70px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            transition: 0.05s ease;
+            border: 1px solid #eef2f6;
+        }
+        .day-number {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #0f172a;
+            background: transparent;
+            width: 100%;
+            padding: 2px 0 1px;
+            border-radius: 30px;
+            margin-bottom: 2px;
+        }
+        .day-shift {
+            font-size: 0.58rem;
+            font-weight: 600;
+            line-height: 1.3;
+            padding: 3px 2px;
+            border-radius: 30px;
+            width: 100%;
+            word-break: break-word;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 28px;
+            color: #0b1e33;
+            background: #e9edf2;
+            border: 1px solid transparent;
+            margin-top: 1px;
+        }
+        /* 班別顏色 (對照表) */
+        .shift-N51 { background: #b3d9ff; border-color: #6ea8fe; color: #003d66; }       /* 藍 */
+        .shift-N51月會 { background: #b3d9ff; border-color: #6ea8fe; color: #003d66; }  
+        .shift-N20 { background: #b6f0c6; border-color: #5fcf86; color: #0a3d1f; }        /* 綠 */
+        .shift-N21外 { background: #ffd6a8; border-color: #fea34a; color: #753b00; }      /* 橘 */
+        .shift-N07 { background: #ffe68f; border-color: #facc15; color: #6b4d00; }        /* 黃 */
+        .shift-N04日盤 { background: #fca5a5; border-color: #ef4444; color: #5f0f0f; }    /* 紅 */
+        .shift-包裹課 { background: #d8b4fe; border-color: #a855f7; color: #3b1f5e; }     /* 紫 */
+        .shift-例假 { background: #e2e8f0; border-color: #cbd5e1; color: #475569; }       /* 灰白 */
+        .shift-休假 { background: #e2e8f0; border-color: #cbd5e1; color: #475569; }
+        .shift-空白 { background: #f1f4f9; border-color: #dce1e9; color: #6b7a8f; }
+        /* 特殊標記 */
+        .month-tag {
+            background: #dbeafe;
+            border-radius: 40px;
+            padding: 0 10px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        .footer-legend {
+            margin-top: 24px;
+            background: #f1f5f9;
+            border-radius: 28px;
+            padding: 16px 12px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px 14px;
+            border: 1px solid #e2e8f0;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #1e293b;
+        }
+        .legend-color {
+            width: 22px;
+            height: 22px;
+            border-radius: 30px;
+            border: 1px solid rgba(0,0,0,0.08);
+            flex-shrink: 0;
+        }
+        .note {
+            margin-top: 12px;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #64748b;
+            letter-spacing: 0.3px;
+        }
+        /* 手機滿版輔助 */
+        @media (max-width: 420px) {
+            .container { padding: 10px 6px 16px; }
+            .day-cell { min-height: 60px; padding: 4px 1px; }
+            .day-number { font-size: 0.75rem; }
+            .day-shift { font-size: 0.5rem; min-height: 22px; padding: 2px 1px; }
+            .weekdays { font-size: 0.7rem; padding: 6px 0; }
+            .footer-legend { gap: 4px 10px; padding: 12px 6px; }
+            .legend-item { font-size: 0.6rem; }
+        }
+        @media (max-width: 360px) {
+            .day-cell { min-height: 52px; }
+            .day-shift { font-size: 0.45rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>📋 謝珺潔</h1>
+    <div class="subhead"><span>2026年9月 · 班表</span></div>
+
+    <!-- 星期標頭 -->
+    <div class="weekdays">
+        <div>一</div><div>二</div><div>三</div><div>四</div><div>五</div><div>六</div><div>日</div>
+    </div>
+
+    <!-- 月曆本體 -->
+    <div class="calendar-grid" id="calendarGrid">
+        <!-- 由 JavaScript 動態產生，確保日期與星期完全對齊 -->
+    </div>
+
+    <!-- 圖例 -->
+    <div class="footer-legend">
+        <span class="legend-item"><span class="legend-color" style="background:#b3d9ff;"></span> N51 / 月會</span>
+        <span class="legend-item"><span class="legend-color" style="background:#b6f0c6;"></span> N20</span>
+        <span class="legend-item"><span class="legend-color" style="background:#ffd6a8;"></span> N21外</span>
+        <span class="legend-item"><span class="legend-color" style="background:#ffe68f;"></span> N07</span>
+        <span class="legend-item"><span class="legend-color" style="background:#fca5a5;"></span> N04日盤</span>
+        <span class="legend-item"><span class="legend-color" style="background:#d8b4fe;"></span> 包裹課</span>
+        <span class="legend-item"><span class="legend-color" style="background:#e2e8f0;"></span> 例假/休假</span>
+    </div>
+    <div class="note">* 點擊或截圖 · 手機滿版顯示</div>
+</div>
+
+<script>
+    (function() {
+        // ----- 2026年9月資料 (日期 -> 班別) -----
+        // 索引: 日期 (1~30)
+        const shiftMap = {
+            1: 'N51', 2: 'N51', 3: 'N51', 4: '休假', 5: 'N21外', 6: 'N20',
+            7: 'N20', 8: '例假', 9: 'N20', 10: 'N07', 11: 'N04日盤', 12: 'N20', 13: '休假',
+            14: 'N51月會', 15: 'N51', 16: 'N51', 17: '休假', 18: '包裹課', 19: '休假', 20: 'N51',
+            21: 'N51', 22: '例假', 23: 'N51', 24: '休假', 25: '休假', 26: 'N51', 27: 'N51',
+            28: 'N51', 29: '休假', 30: 'N51'
+        };
+
+        // 2026年9月1日為星期二 (JS getDay() 0=星期日, 1=星期一 ...)
+        // 9/1 (二) => getDay() = 2
+        const firstDayOfMonth = 2; // 星期二
+
+        const totalDays = 30; // 2026年9月有30天
+
+        const grid = document.getElementById('calendarGrid');
+        if (!grid) return;
+
+        // 清空 grid
+        grid.innerHTML = '';
+
+        // 填入空白格 (從星期一開始對齊)
+        // 因為 9/1 (二) 前面需要空 1 格 (星期一)
+        const leadingBlanks = 1; // 週一空1格，週二開始
+
+        for (let i = 0; i < leadingBlanks; i++) {
+            const emptyCell = document.createElement('div');
+            emptyCell.className = 'day-cell';
+            emptyCell.style.background = 'transparent';
+            emptyCell.style.boxShadow = 'none';
+            emptyCell.style.border = 'none';
+            emptyCell.style.minHeight = '50px';
+            grid.appendChild(emptyCell);
+        }
+
+        // 填入日期 1~30
+        for (let day = 1; day <= totalDays; day++) {
+            const cell = document.createElement('div');
+            cell.className = 'day-cell';
+
+            // 日期數字
+            const numberDiv = document.createElement('div');
+            numberDiv.className = 'day-number';
+            numberDiv.textContent = day;
+            cell.appendChild(numberDiv);
+
+            // 班別
+            const shiftText = shiftMap[day] || ' '; // 若無資料顯示空白
+            const shiftDiv = document.createElement('div');
+            shiftDiv.className = 'day-shift';
+
+            // 根據班別加上對應的 class (顏色)
+            let shiftKey = shiftText;
+            // 處理特殊名稱: N51月會 歸類 N51 顏色, 但保留文字
+            if (shiftText === 'N51月會') {
+                shiftKey = 'N51';
+            } else if (shiftText === 'N04日盤') {
+                shiftKey = 'N04日盤';
+            } else if (shiftText === '包裹課') {
+                shiftKey = '包裹課';
+            } else if (shiftText === '例假' || shiftText === '休假') {
+                shiftKey = '例假'; // 使用同一種顏色
+            } else {
+                shiftKey = shiftText; // N51, N20, N21外, N07
+            }
+
+            // 加入對應 shift- 前綴 class (若為空白則用 shift-空白)
+            let cssClass = '';
+            if (shiftText === ' ' || shiftText === '') {
+                cssClass = 'shift-空白';
+            } else {
+                // 對應 class 名稱: shift-N51, shift-N20, shift-N21外, shift-N07, shift-N04日盤, shift-包裹課, shift-例假
+                // 但 shiftKey 可能包含 'N51月會' 我們已轉為 N51
+                let baseKey = shiftKey;
+                // 處理例外: 若 shiftText 是 'N51月會' 但 shiftKey 為 'N51' 沒問題
+                // 但 'N04日盤' 保持原樣
+                if (shiftKey === 'N04日盤') baseKey = 'N04日盤';
+                else if (shiftKey === '包裹課') baseKey = '包裹課';
+                else if (shiftKey === '例假') baseKey = '例假';
+                else if (shiftKey === 'N51') baseKey = 'N51';
+                else if (shiftKey === 'N20') baseKey = 'N20';
+                else if (shiftKey === 'N21外') baseKey = 'N21外';
+                else if (shiftKey === 'N07') baseKey = 'N07';
+                // 若都不是，直接使用 shiftKey
+                cssClass = 'shift-' + baseKey;
+            }
+
+            // 如果 shiftText 是 '例假' 或 '休假' 統一用 shift-例假
+            if (shiftText === '例假' || shiftText === '休假') {
+                cssClass = 'shift-例假';
+            }
+
+            // 額外: 若 shiftText 包含 '月會' 我們保留文字，但顏色用 N51
+            if (shiftText === 'N51月會') {
+                cssClass = 'shift-N51'; 
+            }
+
+            // 如果班別為空白或未定義，用空白樣式
+            if (shiftText === ' ' || shiftText === '' || !shiftMap[day]) {
+                cssClass = 'shift-空白';
+            }
+
+            // 加上 class，若 cssClass 為空則給一個預設
+            if (cssClass) {
+                shiftDiv.classList.add(cssClass);
+            } else {
+                shiftDiv.classList.add('shift-空白');
+            }
+
+            // 顯示班別文字 (保留完整名稱)
+            let displayText = shiftText;
+            if (displayText === ' ') displayText = '';
+            shiftDiv.textContent = displayText;
+
+            cell.appendChild(shiftDiv);
+            grid.appendChild(cell);
+        }
+
+        // 補齊最後一週的空白 (讓排版完整)
+        const totalCells = leadingBlanks + totalDays;
+        const remainder = totalCells % 7;
+        if (remainder !== 0) {
+            const blanksToAdd = 7 - remainder;
+            for (let i = 0; i < blanksToAdd; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'day-cell';
+                emptyCell.style.background = 'transparent';
+                emptyCell.style.boxShadow = 'none';
+                emptyCell.style.border = 'none';
+                emptyCell.style.minHeight = '50px';
+                grid.appendChild(emptyCell);
+            }
+        }
+    })();
+</script>
+</body>
+</html>
