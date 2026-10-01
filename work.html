@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>謝瑀潔 2026年9月班表</title>
+    <title>謝瑀潔 2026年10月班表</title>
     <style>
         * {
             box-sizing: border-box;
@@ -113,15 +113,15 @@
             margin-top: 1px;
         }
         /* 班別顏色 (對照表) */
-        .shift-N51 { background: #b3d9ff; border-color: #6ea8fe; color: #003d66; }       /* 藍 */
+        .shift-N51 { background: #f4f4f5eb; border-color: #6ea8fe; color: hsl(180, 2%, 10%); }       /* 藍 */
         .shift-N51月會 { background: #b3d9ff; border-color: #6ea8fe; color: #003d66; }  
         .shift-N20 { background: #b6f0c6; border-color: #5fcf86; color: #0a3d1f; }        /* 綠 */
         .shift-N21外 { background: #ffd6a8; border-color: #fea34a; color: #753b00; }      /* 橘 */
         .shift-N07 { background: #ffe68f; border-color: #facc15; color: #6b4d00; }        /* 黃 */
         .shift-N04日盤 { background: #fca5a5; border-color: #ef4444; color: #5f0f0f; }    /* 紅 */
         .shift-包裹課 { background: #d8b4fe; border-color: #a855f7; color: #3b1f5e; }     /* 紫 */
-        .shift-例假 { background: #e2e8f0; border-color: #cbd5e1; color: #475569; }       /* 灰白 */
-        .shift-休假 { background: #e2e8f0; border-color: #cbd5e1; color: #475569; }
+        .shift-例假 { background: #b80dad5b; border-color: #ef0909; color: hsl(0, 95%, 48%); }       /* 灰白 */
+        .shift-國訂假 { background: #cb2626; border-color: #ef0909; color: hsl(203, 67%, 98%); }
         .shift-空白 { background: #f1f4f9; border-color: #dce1e9; color: #6b7a8f; }
         /* 特殊標記 */
         .month-tag {
@@ -183,7 +183,7 @@
 <body>
 <div class="container">
     <h1>📋 謝瑀潔</h1>
-    <div class="subhead"><span>2026年9月 · 班表</span></div>
+    <div class="subhead"><span>2026年10月 · 班表</span></div>
 
     <!-- 星期標頭 -->
     <div class="weekdays">
@@ -197,15 +197,15 @@
 
     <!-- 圖例 -->
     <div class="footer-legend">
-        <span class="legend-item"><span class="legend-color" style="background:#b3d9ff;"></span> N51 / 月會</span>
+        <span class="legend-item"><span class="legend-color" style="background:#b3d9ff;"></span> N51 </span>
         <span class="legend-item"><span class="legend-color" style="background:#b6f0c6;"></span> N20</span>
-        <span class="legend-item"><span class="legend-color" style="background:#ffd6a8;"></span> N21外</span>
+        <span class="legend-item"><span class="legend-color" style="background:#ffd6a8;"></span> N21</span>
         <span class="legend-item"><span class="legend-color" style="background:#ffe68f;"></span> N07</span>
-        <span class="legend-item"><span class="legend-color" style="background:#fca5a5;"></span> N04日盤</span>
-        <span class="legend-item"><span class="legend-color" style="background:#d8b4fe;"></span> 包裹課</span>
-        <span class="legend-item"><span class="legend-color" style="background:#e2e8f0;"></span> 例假/休假</span>
+        <span class="legend-item"><span class="legend-color" style="background:#fca5a5;"></span> N04</span>
+        <span class="legend-item"><span class="legend-color" style="background:#f0042f;"></span> 國訂假</span>
+        <span class="legend-item"><span class="legend-color" style="background:#ed0505;"></span> 例假/休假</span>
     </div>
-    <div class="note">* 點擊或截圖 · 手機滿版顯示</div>
+    <div class="note">* 國訂假 2 天 · 例假/休假 10 天</div>
 </div>
 
 <script>
@@ -213,18 +213,18 @@
         // ----- 2026年9月資料 (日期 -> 班別) -----
         // 索引: 日期 (1~30)
         const shiftMap = {
-            1: 'N51', 2: 'N51', 3: 'N51', 4: '休假', 5: 'N21外', 6: 'N20',
-            7: 'N20', 8: '例假', 9: 'N20', 10: 'N07', 11: 'N04日盤', 12: 'N20', 13: '休假',
-            14: 'N51月會', 15: 'N51', 16: 'N51', 17: '休假', 18: '包裹課', 19: '休假', 20: 'N51',
-            21: 'N51', 22: '例假', 23: 'N51', 24: '休假', 25: '休假', 26: 'N51', 27: 'N51',
-            28: 'N51', 29: '休假', 30: 'N51'
+            1: '國訂假', 2: '8-17',     3: 'N11',   4: '例假', 5: 'N51', 6: 'N51',
+            7: '休假',   8: '例假',     9: 'N51',   10: 'N11', 11: '休假', 12: 'N11', 13: 'N51',
+            14: 'N51',  15: '國訂假',   16: '例假', 17: '休假', 18: 'N11', 19: 'N51', 20: 'N51',
+            21: '例假', 22: '休假',     23: 'N11',  24: 'N20', 25: 'N51', 26: '例假', 27: 'N11',
+            28: 'N11',  29: '日07S',    30: '休假', 31: 'N23'
         };
 
-        // 2026年9月1日為星期二 (JS getDay() 0=星期日, 1=星期一 ...)
-        // 9/1 (二) => getDay() = 2
-        const firstDayOfMonth = 2; // 星期二
+        // 2026年10月1日為星期四 (JS getDay() 0=星期日, 1=星期一 ...)
+        // 10/1 (四) => getDay() = 4
+        const firstDayOfMonth = 4; // 星期四
 
-        const totalDays = 30; // 2026年9月有30天
+        const totalDays = 31; // 2026年10月有31天
 
         const grid = document.getElementById('calendarGrid');
         if (!grid) return;
@@ -234,7 +234,7 @@
 
         // 填入空白格 (從星期一開始對齊)
         // 因為 9/1 (二) 前面需要空 1 格 (星期一)
-        const leadingBlanks = 1; // 週一空1格，週二開始
+        const leadingBlanks = 3; // 週一空1格，週二開始
 
         for (let i = 0; i < leadingBlanks; i++) {
             const emptyCell = document.createElement('div');
@@ -269,8 +269,8 @@
                 shiftKey = 'N51';
             } else if (shiftText === 'N04日盤') {
                 shiftKey = 'N04日盤';
-            } else if (shiftText === '包裹課') {
-                shiftKey = '包裹課';
+            } else if (shiftText === '國訂假') {
+                shiftKey = '國訂假';
             } else if (shiftText === '例假' || shiftText === '休假') {
                 shiftKey = '例假'; // 使用同一種顏色
             } else {
@@ -288,7 +288,7 @@
                 // 處理例外: 若 shiftText 是 'N51月會' 但 shiftKey 為 'N51' 沒問題
                 // 但 'N04日盤' 保持原樣
                 if (shiftKey === 'N04日盤') baseKey = 'N04日盤';
-                else if (shiftKey === '包裹課') baseKey = '包裹課';
+                else if (shiftKey === '國訂假') baseKey = '國訂假';
                 else if (shiftKey === '例假') baseKey = '例假';
                 else if (shiftKey === 'N51') baseKey = 'N51';
                 else if (shiftKey === 'N20') baseKey = 'N20';
